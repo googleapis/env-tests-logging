@@ -93,6 +93,16 @@ EOF
   set -e
   # deploy test container
   kubectl apply -f $TMP_DIR
+  # wait for pod to spin up
+  kubectl wait --for=condition=ready pod -l app=$SERVICE_NAME
+  # wait for the pub/sub subscriber to start
+  NUM_SUBSCRIBERS=0
+  TRIES=0
+  while [[ "${NUM_SUBSCRIBERS}" -lt 1 && "${TRIES}" -lt 30 ]]; do
+    sleep 5
+    NUM_SUBSCRIBERS=$(gcloud pubsub topics list-subscriptions $SERVICE_NAME 2> /dev/null | wc -l)
+    TRIES=$((TRIES + 1))
+  done
 }
 
 filter-string() {
