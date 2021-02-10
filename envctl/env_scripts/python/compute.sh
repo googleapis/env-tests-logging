@@ -47,7 +47,7 @@ verify() {
 
 deploy() {
   build_container
-  gcloud beta compute instances create-with-container \
+  gcloud compute instances create-with-container \
     $SERVICE_NAME \
     --container-image $GCR_PATH \
     --container-env PUBSUB_TOPIC="$SERVICE_NAME",ENABLE_SUBSCRIBER="true"
