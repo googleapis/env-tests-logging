@@ -98,8 +98,8 @@ EOF
   # wait for the pub/sub subscriber to start
   NUM_SUBSCRIBERS=0
   TRIES=0
-  while [[ "${NUM_SUBSCRIBERS}" -lt 1 && "${TRIES}" -lt 30 ]]; do
-    sleep 5
+  while [[ "${NUM_SUBSCRIBERS}" -lt 1 && "${TRIES}" -lt 10 ]]; do
+    sleep 10
     NUM_SUBSCRIBERS=$(gcloud pubsub topics list-subscriptions $SERVICE_NAME 2> /dev/null | wc -l)
     TRIES=$((TRIES + 1))
   done
