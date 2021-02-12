@@ -98,6 +98,7 @@ EOF
   set -e
   # deploy test container
   kubectl apply -f $TMP_DIR
+  sleep 60
   # wait for pod to spin up
   kubectl wait --for=condition=ready pod -l app=$SERVICE_NAME
   # wait for the pub/sub subscriber to start
