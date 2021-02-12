@@ -45,3 +45,8 @@ def pylogging(log_text="pylogging", severity="warning", **kwargs):
         logging.error(log_text)
     else:
         logging.critical(log_text)
+
+def print_handlers(**kwargs):
+    root_logger = logging.getLogger()
+    handlers_str = ', '.join([type(h).__name__ for h in root_logger.handlers])
+    logging.info(handlers_str)
