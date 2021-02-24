@@ -26,8 +26,8 @@ destroy() {
   gcloud pubsub topics delete $SERVICE_NAME -q 2> /dev/null
   gcloud pubsub subscriptions delete $SERVICE_NAME-subscriber -q 2> /dev/null
   # delete container images
-  export GCR_PATH=gcr.io/$PROJECT_ID/logging:$SERVICE_NAME
-  gcloud container images delete $GCR_PATH -q --force-delete-tags 2> /dev/null
+  #export GCR_PATH=gcr.io/$PROJECT_ID/logging:$SERVICE_NAME
+  #gcloud container images delete $GCR_PATH -q --force-delete-tags 2> /dev/null
   # delete cluster
   gcloud container clusters delete --zone $ZONE $SERVICE_NAME -q
   set -e
