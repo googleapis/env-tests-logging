@@ -59,7 +59,7 @@ attach_or_create_gke_cluster(){
     gcloud container clusters create $SERVICE_NAME \
       --zone $ZONE \
       --scopes "https://www.googleapis.com/auth/pubsub" \
-      --network kubernetes
+      --network kubernetes --subnetwork kubernetes
   fi
   set -e
 }
