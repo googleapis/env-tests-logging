@@ -29,7 +29,7 @@ destroy() {
   #export GCR_PATH=gcr.io/$PROJECT_ID/logging:$SERVICE_NAME
   #gcloud container images delete $GCR_PATH -q --force-delete-tags 2> /dev/null
   # delete cluster
-  gcloud container clusters delete --zone $ZONE $SERVICE_NAME -q
+  #gcloud container clusters delete --zone $ZONE $SERVICE_NAME -q
   set -e
 }
 
