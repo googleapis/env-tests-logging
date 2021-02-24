@@ -58,7 +58,8 @@ attach_or_create_gke_cluster(){
     echo "cluster not found. creating..."
     gcloud container clusters create $SERVICE_NAME \
       --zone $ZONE \
-      --scopes "https://www.googleapis.com/auth/pubsub"
+      --scopes "https://www.googleapis.com/auth/pubsub" \
+      --network kubernetes
   fi
   set -e
 }
