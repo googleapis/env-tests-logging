@@ -35,6 +35,9 @@ from test_utils.retry import RetryErrors
 from .script_utils import ScriptRunner
 from .script_utils import Command
 
+class LogsNotFound(RuntimeError):
+    """raised when filter returns no logs."""
+    pass
 
 class Common:
     _client = Client()
@@ -54,7 +57,7 @@ class Common:
         iterator = self._client.list_entries(filter_=filter_str)
         entries = list(iterator)
         if not entries:
-            raise RuntimeError("no logs found")
+            raise LogsNotFound
         return entries
 
     def _trigger(self, function, **kwargs):
@@ -92,7 +95,7 @@ class Common:
         if not os.getenv("NO_CLEAN"):
             cls._script.run_command(Command.Destroy)
 
-    @RetryErrors(exception=RuntimeError)
+    @RetryErrors(exception=LogsNotFound)
     def test_receive_log(self):
         log_text = f"{inspect.currentframe().f_code.co_name}: {uuid.uuid1()}"
         self._trigger("pylogging", log_text=log_text)
