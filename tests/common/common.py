@@ -102,8 +102,6 @@ class Common:
         # retrieve resulting logs
         log_list = self._get_logs(filter_str)
 
-        self.assertEqual(len(log_list), 1)
-
         found_log = None
         for log in log_list:
             message = (
