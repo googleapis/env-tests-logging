@@ -115,3 +115,24 @@ class Common:
             if message and log_text in message:
                 found_log = log
         self.assertIsNotNone(found_log, "expected log text not found")
+
+    @RetryErrors(exception=LogsNotFound)
+    def test_unicode_log(self):
+        log_text = f"{inspect.currentframe().f_code.co_name}: 哈😃🚀 {uuid.uuid1()}"
+        self._trigger("pylogging", log_text=log_text)
+        # give the command time to be received
+        sleep(30)
+        filter_str = self._add_time_condition_to_filter(log_text)
+        # retrieve resulting logs
+        log_list = self._get_logs(filter_str)
+
+        found_log = None
+        for log in log_list:
+            message = (
+                log.payload.get("message", None)
+                if isinstance(log.payload, dict)
+                else str(log.payload)
+            )
+            if message and log_text in message:
+                found_log = log
+        self.assertIsNotNone(found_log, "expected log text not found")
