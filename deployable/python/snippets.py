@@ -15,6 +15,8 @@
 import logging
 import os
 
+from google.cloud.logging_v2._helpers import retrieve_metadata_server
+
 try:
     import google.cloud.logging
 except ImportError:
@@ -69,3 +71,8 @@ def print_env_vars(env_var=None, **kwargs):
     else:
         logging.error(os.environ)
 
+def get_metadata_server(metadata_key=None, **kwargs):
+    if metadata_key is None:
+        metadata_key = ""
+    data = retrieve_metadata_server(metadata_key)
+    logging.error(f"key: {metadata_key}, data:{data}")
