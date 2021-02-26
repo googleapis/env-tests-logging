@@ -65,6 +65,25 @@ class Common:
         args_str = ",".join([f'{k}="{v}"' for k, v in kwargs.items()])
         self._script.run_command(Command.Trigger, [function, args_str])
 
+    @RetryErrors(exception=LogsNotFound)
+    def trigger_and_retrieve(self, log_text, append_uuid=True, max_tries=6):
+        if append_uuid:
+            log_text = f"{log_text} - {uuid.uuid1()}"
+        self._trigger("pylogging", log_text=log_text)
+        filter_str = self._add_time_condition_to_filter(log_text)
+        # give the command time to be received
+        tries = 0
+        while tries < max_tries:
+            # retrieve resulting logs
+            try:
+                log_list = self._get_logs(filter_str)
+                return log_list
+            except LogsNotFound:
+                sleep(10)
+                tries += 1
+        # log not found
+        raise LogsNotFound
+
     @classmethod
     def setUpClass(cls):
         if not cls.environment:
@@ -95,15 +114,9 @@ class Common:
         if not os.getenv("NO_CLEAN"):
             cls._script.run_command(Command.Destroy)
 
-    @RetryErrors(exception=LogsNotFound)
     def test_receive_log(self):
-        log_text = f"{inspect.currentframe().f_code.co_name}: {uuid.uuid1()}"
-        self._trigger("pylogging", log_text=log_text)
-        # give the command time to be received
-        sleep(30)
-        filter_str = self._add_time_condition_to_filter(log_text)
-        # retrieve resulting logs
-        log_list = self._get_logs(filter_str)
+        log_text = f"{inspect.currentframe().f_code.co_name}"
+        log_list = self.trigger_and_retrieve(log_text)
 
         found_log = None
         for log in log_list:
