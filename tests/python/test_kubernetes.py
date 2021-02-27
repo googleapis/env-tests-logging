@@ -14,6 +14,7 @@
 
 import logging
 import unittest
+import inspect
 
 import google.cloud.logging
 
