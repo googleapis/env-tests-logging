@@ -32,5 +32,5 @@ class TestComputeEngine(Common, unittest.TestCase):
         found_resource = log_list[0].resource
 
         self.assertEqual(found_resource.type, "gce_instance")
-        self.assertIsNotNone(found_resource.labels["zone"])
-        self.assertIsNotNone(found_resource.labels["instance_id"])
+        self.assertTrue(found_resource.labels["zone"])
+        self.assertTrue(found_resource.labels["instance_id"])

@@ -32,5 +32,5 @@ class TestCloudFunctions(Common, unittest.TestCase):
         found_resource = log_list[0].resource
 
         self.assertEqual(found_resource.type, "cloud_function")
-        self.assertIsNotNone(found_resource.labels["region"])
-        self.assertIsNotNone(found_resource.labels["function_name"])
+        self.assertTrue(found_resource.labels["region"])
+        self.assertTrue(found_resource.labels["function_name"])

@@ -32,9 +32,9 @@ class TestKubernetesEngine(Common, unittest.TestCase):
         found_resource = log_list[0].resource
 
         self.assertEqual(found_resource.type, "k8s_container")
-        self.assertIsNotNone(found_resource.labels["project_id"])
-        self.assertIsNotNone(found_resource.labels["location"])
-        self.assertIsNotNone(found_resource.labels["cluster_name"])
-        self.assertIsNotNone(found_resource.labels["namespace_name"])
-        self.assertIsNotNone(found_resource.labels["pod_name"])
-        self.assertIsNotNone(found_resource.labels["container_name"])
+        self.assertTrue(found_resource.labels["project_id"])
+        self.assertTrue(found_resource.labels["location"])
+        self.assertTrue(found_resource.labels["cluster_name"])
+        self.assertTrue(found_resource.labels["namespace_name"])
+        self.assertTrue(found_resource.labels["pod_name"])
+        self.assertTrue(found_resource.labels["container_name"])

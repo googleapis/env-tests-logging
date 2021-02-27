@@ -29,7 +29,7 @@ class CommonAppEngine():
         found_resource = log_list[0].resource
 
         self.assertEqual(found_resource.type, "gae_app")
-        self.assertIsNotNone(found_resource.labels["project_id"])
-        self.assertIsNotNone(found_resource.labels["module_id"])
-        self.assertIsNotNone(found_resource.labels["version_id"])
-        self.assertIsNotNone(found_resource.labels["zone"])
+        self.assertTrue(found_resource.labels["project_id"])
+        self.assertTrue(found_resource.labels["module_id"])
+        self.assertTrue(found_resource.labels["version_id"])
+        self.assertTrue(found_resource.labels["zone"])

@@ -34,8 +34,8 @@ class TestCloudRun(Common, unittest.TestCase):
         found_resource = log_list[0].resource
 
         self.assertEqual(found_resource.type, "cloud_run_revision")
-        self.assertIsNotNone(found_resource.labels["project_id"])
-        self.assertIsNotNone(found_resource.labels["service_name"])
-        self.assertIsNotNone(found_resource.labels["revision_name"])
-        self.assertIsNotNone(found_resource.labels["location"])
-        self.assertIsNotNone(found_resource.labels["configuration_name"])
+        self.assertTrue(found_resource.labels["project_id"])
+        self.assertTrue(found_resource.labels["service_name"])
+        self.assertTrue(found_resource.labels["revision_name"])
+        self.assertTrue(found_resource.labels["location"])
+        self.assertTrue(found_resource.labels["configuration_name"])
