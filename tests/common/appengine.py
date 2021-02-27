@@ -14,14 +14,22 @@
 
 import logging
 import unittest
+import inspect
 
 import google.cloud.logging
 
 from ..common.common import Common
-from ..common.appengine import CommonAppEngine
 
 
-class TestAppEngineFlex(Common, CommonAppEngine, unittest.TestCase):
+class CommonAppEngine():
 
-    environment = "appengine_flex_python"
-    language = "python"
+    def test_monitored_resource(self):
+        log_text = f"{inspect.currentframe().f_code.co_name}"
+        log_list = self.trigger_and_retrieve(log_text)
+        found_resource = log_list[0].resource
+
+        self.assertEqual(found_resource.type, "gae_app")
+        self.assertIsNotNone(found_resource.labels["project_id"])
+        self.assertIsNotNone(found_resource.labels["module_id"])
+        self.assertIsNotNone(found_resource.labels["version_id"])
+        self.assertIsNotNone(found_resource.labels["zone"])
