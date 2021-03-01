@@ -27,16 +27,16 @@ add_service_accounts() {
   local PROJECT_NUMBER=$(gcloud projects list --filter=$PROJECT_ID --format="value(PROJECT_NUMBER)")
   gcloud projects add-iam-policy-binding $PROJECT_ID \
     --member=serviceAccount:service-$PROJECT_NUMBER@gcp-sa-pubsub.iam.gserviceaccount.com \
-     --role=roles/iam.serviceAccountTokenCreator 2> /dev/null
+     --role=roles/iam.serviceAccountTokenCreator
   gcloud iam service-accounts create $SA_NAME \
-     --display-name "Pub/Sub Invoker" 2> /dev/null
+     --display-name "Pub/Sub Invoker"
   gcloud run services add-iam-policy-binding  $SERVICE_NAME \
      --member=serviceAccount:$SA_NAME@$PROJECT_ID.iam.gserviceaccount.com \
-     --role=roles/run.invoker 2> /dev/null
+     --role=roles/run.invoker
   RUN_URL=$(gcloud run services list --filter=$SERVICE_NAME --format="value(URL)")
   gcloud pubsub subscriptions create $SERVICE_NAME-subscriber --topic $SERVICE_NAME \
     --push-endpoint=$RUN_URL \
-    --push-auth-service-account=$SA_NAME@$PROJECT_ID.iam.gserviceaccount.com 2> /dev/null
+    --push-auth-service-account=$SA_NAME@$PROJECT_ID.iam.gserviceaccount.com
   set -e
 }
 
