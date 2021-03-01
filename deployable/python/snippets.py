@@ -49,10 +49,12 @@ def pylogging(log_text="pylogging", severity="warning", **kwargs):
     else:
         logging.critical(log_text)
 
+
 def print_handlers(**kwargs):
     root_logger = logging.getLogger()
-    handlers_str = ', '.join([type(h).__name__ for h in root_logger.handlers])
+    handlers_str = ", ".join([type(h).__name__ for h in root_logger.handlers])
     logging.info(handlers_str)
+
 
 def remove_stream_handlers(**kwargs):
     logger = logging.getLogger()
@@ -60,6 +62,7 @@ def remove_stream_handlers(**kwargs):
         if isinstance(handler, logging.StreamHandler):
             logging.error(handler)
             logger.removeHandler(handler)
+
 
 def print_env_vars(env_var=None, **kwargs):
     if env_var:
@@ -70,6 +73,7 @@ def print_env_vars(env_var=None, **kwargs):
             logging.error(f"{env_var}: not found")
     else:
         logging.error(os.environ)
+
 
 def get_metadata_server(metadata_key=None, **kwargs):
     if metadata_key is None:

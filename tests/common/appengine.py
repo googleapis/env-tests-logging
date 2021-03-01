@@ -21,8 +21,7 @@ import google.cloud.logging
 from ..common.common import Common
 
 
-class CommonAppEngine():
-
+class CommonAppEngine:
     def test_monitored_resource(self):
         log_text = f"{inspect.currentframe().f_code.co_name}"
         log_list = self.trigger_and_retrieve(log_text)

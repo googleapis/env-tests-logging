@@ -35,9 +35,12 @@ from test_utils.retry import RetryErrors
 from .script_utils import ScriptRunner
 from .script_utils import Command
 
+
 class LogsNotFound(RuntimeError):
     """raised when filter returns no logs."""
+
     pass
+
 
 class Common:
     _client = Client()
@@ -49,7 +52,6 @@ class Common:
         if not timestamp:
             timestamp = datetime.now(timezone.utc) - timedelta(minutes=10)
         return f'"{filter_str}" AND timestamp > "{timestamp.strftime(time_format)}"'
-
 
     def _get_logs(self, filter_str=None):
         if not filter_str:
