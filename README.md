@@ -54,6 +54,7 @@ Implementation code for each language/environment pair can be found in `envctl/e
   - destroys an existing environment
 - `envctl <language> <environment> trigger <snippet> <optional arguments>`
   - sends a pub/sub message to trigger a snippet in an environment
+  - example: envctl go cloudrun trigger simpleLog logName=my-log
 - `envctl <language> <environment> filter_string`
   - returns a filter that finds logs created by the environment
 - `envctl <language> <environment> logs`
