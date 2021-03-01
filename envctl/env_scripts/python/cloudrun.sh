@@ -73,7 +73,6 @@ deploy() {
   gcloud config set run/platform managed
   gcloud config set run/region us-west1
   gcloud run deploy  \
-    --allow-unauthenticated \
     --image $GCR_PATH \
     --update-env-vars ENABLE_FLASK=true \
     $SERVICE_NAME
