@@ -46,7 +46,7 @@ destroy() {
   gcloud pubsub topics delete $SERVICE_NAME -q 2> /dev/null
   gcloud pubsub subscriptions delete $SERVICE_NAME-subscriber -q 2> /dev/null
   # delete service account
-  gcloud iam service-accounts delete $SA_NAME -q 2> /dev/null
+  gcloud iam service-accounts delete $SA_NAME@$PROJECT_ID.iam.gserviceaccount.com -q 2> /dev/null
   # delete container images
   export GCR_PATH=gcr.io/$PROJECT_ID/logging:$SERVICE_NAME
   gcloud container images delete $GCR_PATH -q --force-delete-tags 2> /dev/null
