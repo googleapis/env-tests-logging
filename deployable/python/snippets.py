@@ -15,10 +15,10 @@
 import logging
 import os
 
-from google.cloud.logging_v2._helpers import retrieve_metadata_server
 
 try:
     import google.cloud.logging
+    from google.cloud.logging_v2._helpers import retrieve_metadata_server
 except ImportError:
     # import at runtime for GAE environments
     import pip
@@ -28,6 +28,7 @@ except ImportError:
     pip.main(["install", "-e", "./python-logging"])
     importlib.reload(site)
     import google.cloud.logging
+    from google.cloud.logging_v2._helpers import retrieve_metadata_server
 
 
 def simple_log(log_name=None, log_text="simple_log", **kwargs):
