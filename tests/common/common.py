@@ -71,7 +71,7 @@ class Common:
     def trigger_and_retrieve(self, log_text, append_uuid=True, max_tries=6):
         if append_uuid:
             log_text = f"{log_text} - {uuid.uuid1()}"
-        self._trigger("pylogging", log_text=log_text)
+        self._trigger("simplelog", log_text=log_text)
         filter_str = self._add_time_condition_to_filter(log_text)
         # give the command time to be received
         tries = 0
