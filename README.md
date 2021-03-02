@@ -54,7 +54,7 @@ Implementation code for each language/environment pair can be found in `envctl/e
   - destroys an existing environment
 - `envctl <language> <environment> trigger <snippet> <optional arguments>`
   - sends a pub/sub message to trigger a snippet in an environment
-  - example: envctl go cloudrun trigger simplelog param=value
+  - optional arguments are embedded as [custom attributes](https://cloud.google.com/pubsub/docs/publisher#using_attributes) in Pub/Sub messages
 - `envctl <language> <environment> filter-string`
   - returns a filter that finds logs created by the environment
 - `envctl <language> <environment> logs`
@@ -66,7 +66,9 @@ Contains the pytest code that tests each environment. Common logic is stored as 
 Concrete implementations for each environment can be found in `tests/<language>/test_<environment>.py`. 
 Test files in `tests/<language>` can inherit from any file in `tests/common` logic as needed, in order to share test logic between environments.
 
-Current common tests include:
+### Shared Tests
 
-- `simplelog(logname, logtext)`: tests logging a simple text log
-- `standardlog()`: tests logging with standard library wrapper
+| Test Name      | Optional Input       | Description                      |
+| -------------- | ----------------     | -------------------------------- |
+| `simplelog`    | `logname`, `logtext` |  Logs a simple text payload      |
+| `standardlog`  | `logname`, `logtext` |  Logs a simple text payload using a standard library wrapper |
