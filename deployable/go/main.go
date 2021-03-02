@@ -57,7 +57,7 @@ func pubsubHTTP(w http.ResponseWriter, r *http.Request) {
 
 	switch msg {
 	case "simplelog":
-		simpleLog(args)
+		simplelog(args)
 	case "stdLog":
 		break
 	default:
@@ -83,8 +83,8 @@ func main() {
 	}
 }
 
-// [Optional] envctl go <env> trigger simpleLog logname=foo logtext=bar
-func simpleLog(args map[string]string) {
+// [Optional] envctl go <env> trigger simpleLog logname=foo,logtext=bar
+func simplelog(args map[string]string) {
 	ctx := context.Background()
 	projectID, err := metadata.ProjectID()
 	if err != nil {
