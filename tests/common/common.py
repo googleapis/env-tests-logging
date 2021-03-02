@@ -98,7 +98,7 @@ class Common:
     @RetryErrors(exception=LogsNotFound)
     def test_receive_log(self):
         log_text = f"{inspect.currentframe().f_code.co_name}: {uuid.uuid1()}"
-        self._trigger("pylogging", log_text=log_text)
+        self._trigger("simplelog", logtext=log_text)
         # give the command time to be received
         sleep(30)
         filter_str = self._add_time_condition_to_filter(log_text)
