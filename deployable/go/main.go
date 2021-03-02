@@ -27,7 +27,7 @@ import (
 	"cloud.google.com/go/logging"
 )
 
-// PubSubMessage is the payload of a Pub/Sub event.
+// PubSubMessage is the logtext of a Pub/Sub event.
 type pubSubMessage struct {
 	Message struct {
 		Data       []byte            `json:"data,omitempty"`
@@ -56,7 +56,7 @@ func pubsubHTTP(w http.ResponseWriter, r *http.Request) {
 	args := m.Message.Attributes
 
 	switch msg {
-	case "simpleLog":
+	case "simplelog":
 		simpleLog(args)
 	case "stdLog":
 		break
@@ -83,7 +83,7 @@ func main() {
 	}
 }
 
-// [Optional] envctl go <env> trigger simpleLog logName=someName logString=hi
+// [Optional] envctl go <env> trigger simpleLog logname=foo logtext=bar
 func simpleLog(args map[string]string) {
 	ctx := context.Background()
 	projectID, err := metadata.ProjectID()
@@ -96,16 +96,16 @@ func simpleLog(args map[string]string) {
 	}
 	defer client.Close()
 
-	logName := "my-log"
-	if val, ok := args["logName"]; ok {
-		logName = val
+	logname := "my-log"
+	if val, ok := args["logname"]; ok {
+		logname = val
 	}
 
-	logString := "hello world"
-	if val, ok := args["logString"]; ok {
-		logString = val
+	logtext := "hello world"
+	if val, ok := args["logtext"]; ok {
+		logtext = val
 	}
 
-	logger := client.Logger(logName).StandardLogger(logging.Info)
-	logger.Println(logString)
+	logger := client.Logger(logname).StandardLogger(logging.Info)
+	logger.Println(logtext)
 }

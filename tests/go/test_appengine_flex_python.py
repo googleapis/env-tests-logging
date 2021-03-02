@@ -23,4 +23,4 @@ from ..common.common import Common
 class TestAppEngineFlex(Common, unittest.TestCase):
 
     environment = "appengine_flex_python"
-    language = "python"
+    language = "go"

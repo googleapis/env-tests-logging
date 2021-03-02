@@ -23,4 +23,4 @@ from ..common.common import Common
 class TestKubernetesEngine(Common, unittest.TestCase):
 
     environment = "kubernetes"
-    language = "python"
+    language = "go"

@@ -100,3 +100,7 @@ verify() {
   fi
   set -e
 }
+
+filter-string() {
+  echo "resource.type=\"global\""
+}

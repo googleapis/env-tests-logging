@@ -23,4 +23,4 @@ from ..common.common import Common
 class TestComputeEngine(Common, unittest.TestCase):
 
     environment = "compute"
-    language = "python"
+    language = "go"

@@ -23,4 +23,4 @@ from ..common.common import Common
 class TestCloudFunctions(Common, unittest.TestCase):
 
     environment = "functions"
-    language = "python"
+    language = "go"

@@ -53,7 +53,7 @@ class Common:
         args_str = ",".join([f'{k}="{v}"' for k, v in kwargs.items()])
         self._script.run_command(Command.Trigger, [function, args_str])
         # give the command time to be received
-        sleep(30)
+        sleep(45)
         if return_logs:
             log_list = self._get_logs(timestamp)
             return log_list
@@ -90,7 +90,7 @@ class Common:
 
     def test_receive_log(self):
         log_text = f"{inspect.currentframe().f_code.co_name}: {uuid.uuid1()}"
-        log_list = self._trigger("pylogging", log_text=log_text)
+        log_list = self._trigger("simplelog", logtext=log_text)
         found_log = None
         for log in log_list:
             message = (
