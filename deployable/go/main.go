@@ -65,6 +65,22 @@ func pubsubHTTP(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
+// PubSubMessage is the message format received by CloudFunctions
+type PubSubMessage struct {
+	Data []byte `json:"data"`
+}
+
+// PubsubFunction is a background Cloud Function triggered by Pub/Sub
+func PubsubFunction(ctx context.Context, m PubSubMessage) error {
+	log.Println("PUBSUB FUNCTION IS TRIGGERED!")
+	name := string(m.Data) // Automatically decoded from base64.
+	if name == "" {
+		name = "World"
+	}
+	log.Printf("Hello, %s!", name)
+	return nil
+}
+
 func main() {
 	if os.Getenv("ENABLE_SUBSCRIBER") == "" {
 
