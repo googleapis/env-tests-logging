@@ -16,7 +16,6 @@
 set -e # exit on any failure
 set -o pipefail # any step in pipe caused failure
 set -u # undefined variables cause exit
-set -x # TODO: remove this before merge
 
 SERVICE_NAME="log-go-func-$(echo $ENVCTL_ID | head -c 8)x"
 LIBRARY_NAME="google-cloud-go"
