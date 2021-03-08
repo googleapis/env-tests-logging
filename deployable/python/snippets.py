@@ -31,8 +31,8 @@ except ImportError:
     from google.cloud.logging_v2._helpers import retrieve_metadata_server
 
 
-def simplelog(log_name=none, log_text="simple_log", **kwargs):
-    client = google.cloud.logging.client()
+def simplelog(log_name=None, log_text="simple_log", **kwargs):
+    client = google.cloud.logging.Client()
     logger = client.logger(log_name)
     logger.log_text(log_text)
 
