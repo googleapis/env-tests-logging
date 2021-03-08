@@ -27,5 +27,5 @@ class TestCloudFunctions(Common, CommonPython, unittest.TestCase):
     environment = "functions"
     language = "python"
 
-    monitored_resource_name = 'cloud_function'
-    monitored_resource_labels = ['region', 'function_name']
+    monitored_resource_name = "cloud_function"
+    monitored_resource_labels = ["region", "function_name"]

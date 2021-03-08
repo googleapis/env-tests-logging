@@ -23,5 +23,5 @@ from ..common.common import Common
 
 class CommonAppEngine:
 
-    monitored_resource_name = 'gae_app'
-    monitored_resource_labels = ['project_id', 'module_id', 'version_id', 'zone']
+    monitored_resource_name = "gae_app"
+    monitored_resource_labels = ["project_id", "module_id", "version_id", "zone"]

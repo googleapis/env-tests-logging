@@ -27,5 +27,5 @@ class TestComputeEngine(Common, CommonPython, unittest.TestCase):
     environment = "compute"
     language = "python"
 
-    monitored_resource_name = 'gce_instance'
-    monitored_resource_labels = ['instance_id', 'zone']
+    monitored_resource_name = "gce_instance"
+    monitored_resource_labels = ["instance_id", "zone"]

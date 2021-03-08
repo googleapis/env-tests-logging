@@ -21,9 +21,7 @@ import google.cloud.logging
 from ..common.common import Common
 
 
-
 class CommonPython:
-
     def pylogging_test_receive_log(self):
         log_text = f"{inspect.currentframe().f_code.co_name}"
         log_list = self.trigger_and_retrieve(log_text, snippet="pylogging")
