@@ -27,5 +27,5 @@ class TestKubernetesEngine(Common, CommonPython, unittest.TestCase):
     environment = "kubernetes"
     language = "python"
 
-    monitored_resource_name = "cloud_run_revision"
+    monitored_resource_name = "k8s_container"
     monitored_resource_labels = ["project_id", "location", "cluster_name"]
