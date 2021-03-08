@@ -24,7 +24,7 @@ from ..common.common import Common
 class CommonPython:
     def pylogging_test_receive_log(self):
         log_text = f"{inspect.currentframe().f_code.co_name}"
-        log_list = self.trigger_and_retrieve(log_text, snippet="pylogging")
+        log_list = self.trigger_and_retrieve(log_text, function="pylogging")
 
         found_log = None
         for log in log_list:
@@ -39,7 +39,7 @@ class CommonPython:
 
     def test_monitored_resource_pylogging(self):
         log_text = f"{inspect.currentframe().f_code.co_name}"
-        log_list = self.trigger_and_retrieve(log_text, snippet="pylogging")
+        log_list = self.trigger_and_retrieve(log_text, function="pylogging")
         found_resource = log_list[0].resource
 
         self.assertIsNotNone(self.monitored_resource_name)

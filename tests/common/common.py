@@ -70,10 +70,10 @@ class Common:
         self._script.run_command(Command.Trigger, [function, args_str])
 
     @RetryErrors(exception=LogsNotFound, delay=2)
-    def trigger_and_retrieve(self, log_text, append_uuid=True, max_tries=6):
+    def trigger_and_retrieve(self, log_text, function="simplelog", append_uuid=True, max_tries=6):
         if append_uuid:
             log_text = f"{log_text} - {uuid.uuid1()}"
-        self._trigger("simplelog", log_text=log_text)
+        self._trigger(function, log_text=log_text)
         filter_str = self._add_time_condition_to_filter(log_text)
         # give the command time to be received
         tries = 0
