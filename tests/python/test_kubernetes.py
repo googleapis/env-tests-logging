@@ -19,9 +19,10 @@ import inspect
 import google.cloud.logging
 
 from ..common.common import Common
+from ..common.python import CommonPython
 
 
-class TestKubernetesEngine(Common, unittest.TestCase):
+class TestKubernetesEngine(Common, CommonPython, unittest.TestCase):
 
     environment = "kubernetes"
     language = "python"

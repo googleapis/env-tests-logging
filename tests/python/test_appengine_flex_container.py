@@ -19,9 +19,10 @@ import google.cloud.logging
 
 from ..common.common import Common
 from ..common.appengine import CommonAppEngine
+from ..common.python import CommonPython
 
 
-class TestAppEngineFlexContainer(Common, CommonAppEngine, unittest.TestCase):
+class TestAppEngineFlexContainer(Common, CommonAppEngine, CommonPython, unittest.TestCase):
 
     environment = "appengine_flex_container"
     language = "python"

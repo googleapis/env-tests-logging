@@ -1,10 +1,10 @@
-# Copyright 2016 Google LLC
+# Copyright 2021 Google LLC
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
 # You may obtain a copy of the License at
 #
-#     http://www.apache.org/licenses/LICENSE-2.0
+#      http://www.apache.org/licenses/LICENSE-2.0
 #
 # Unless required by applicable law or agreed to in writing, software
 # distributed under the License is distributed on an "AS IS" BASIS,
@@ -19,19 +19,22 @@ import inspect
 import google.cloud.logging
 
 from ..common.common import Common
-from ..common.python import CommonPython
 
 
-class TestComputeEngine(Common, CommonPython, unittest.TestCase):
 
-    environment = "compute"
-    language = "python"
+class CommonPython:
 
-    def test_monitored_resource(self):
+    def pylogging_test_receive_log(self):
         log_text = f"{inspect.currentframe().f_code.co_name}"
-        log_list = self.trigger_and_retrieve(log_text)
-        found_resource = log_list[0].resource
+        log_list = self.trigger_and_retrieve(log_text, snippet="pylogging")
 
-        self.assertEqual(found_resource.type, "gce_instance")
-        self.assertTrue(found_resource.labels["zone"])
-        self.assertTrue(found_resource.labels["instance_id"])
+        found_log = None
+        for log in log_list:
+            message = (
+                log.payload.get("message", None)
+                if isinstance(log.payload, dict)
+                else str(log.payload)
+            )
+            if message and log_text in message:
+                found_log = log
+        self.assertIsNotNone(found_log, "expected log text not found")

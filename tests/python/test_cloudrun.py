@@ -21,9 +21,10 @@ import google.cloud.logging
 from google.cloud.logging_v2.resource import Resource
 
 from ..common.common import Common
+from ..common.python import CommonPython
 
 
-class TestCloudRun(Common, unittest.TestCase):
+class TestCloudRun(Common, CommonPython, unittest.TestCase):
 
     environment = "cloudrun"
     language = "python"

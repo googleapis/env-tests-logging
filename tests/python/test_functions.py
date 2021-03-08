@@ -19,9 +19,10 @@ import inspect
 import google.cloud.logging
 
 from ..common.common import Common
+from ..common.python import CommonPython
 
 
-class TestCloudFunctions(Common, unittest.TestCase):
+class TestCloudFunctions(Common, CommonPython, unittest.TestCase):
 
     environment = "functions"
     language = "python"
