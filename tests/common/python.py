@@ -38,3 +38,15 @@ class CommonPython:
             if message and log_text in message:
                 found_log = log
         self.assertIsNotNone(found_log, "expected log text not found")
+
+    def test_monitored_resource_pylogging(self):
+        log_text = f"{inspect.currentframe().f_code.co_name}"
+        log_list = self.trigger_and_retrieve(log_text, snippet="pylogging")
+        found_resource = log_list[0].resource
+
+        self.assertIsNotNone(self.monitored_resource_name)
+        self.assertIsNotNone(self.monitored_resource_labels)
+
+        self.assertEqual(found_resource.type, self.monitored_resource_name)
+        for label in self.monitored_resource_labels:
+            self.assertTrue(found_resource.labels[label])

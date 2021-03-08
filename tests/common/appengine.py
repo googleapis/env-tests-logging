@@ -22,13 +22,6 @@ from ..common.common import Common
 
 
 class CommonAppEngine:
-    def test_monitored_resource(self):
-        log_text = f"{inspect.currentframe().f_code.co_name}"
-        log_list = self.trigger_and_retrieve(log_text)
-        found_resource = log_list[-1].resource
 
-        self.assertEqual(found_resource.type, "gae_app")
-        self.assertTrue(found_resource.labels["project_id"])
-        self.assertTrue(found_resource.labels["module_id"])
-        self.assertTrue(found_resource.labels["version_id"])
-        self.assertTrue(found_resource.labels["zone"])
+    monitored_resource_name = 'gae_app'
+    monitored_resource_labels = ['project_id', 'module_id', 'version_id', 'zone']
