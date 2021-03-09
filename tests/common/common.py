@@ -31,6 +31,7 @@ import uuid
 import inspect
 
 from test_utils.retry import RetryErrors
+from grpc import RpcError
 
 from .script_utils import ScriptRunner
 from .script_utils import Command
@@ -69,7 +70,7 @@ class Common:
         args_str = ",".join([f'{k}="{v}"' for k, v in kwargs.items()])
         self._script.run_command(Command.Trigger, [function, args_str])
 
-    @RetryErrors(exception=LogsNotFound, delay=2)
+    @RetryErrors(exception=(LogsNotFound, RpcError), delay=2)
     def trigger_and_retrieve(self, log_text, function="simplelog", append_uuid=True, max_tries=6):
         if append_uuid:
             log_text = f"{log_text} - {uuid.uuid1()}"
