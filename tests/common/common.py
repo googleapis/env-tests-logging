@@ -83,7 +83,7 @@ class Common:
             try:
                 log_list = self._get_logs(filter_str)
                 return log_list
-            except LogsNotFound:
+            except (LogsNotFound, RpcError) as e:
                 sleep(10)
                 tries += 1
         # log not found
