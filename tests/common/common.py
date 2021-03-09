@@ -139,7 +139,7 @@ class Common:
             return True
         log_text = f"{inspect.currentframe().f_code.co_name}"
         log_list = self.trigger_and_retrieve(log_text)
-        found_resource = log_list[0].resource
+        found_resource = log_list[-1].resource
 
         self.assertIsNotNone(self.monitored_resource_name)
         self.assertIsNotNone(self.monitored_resource_labels)
