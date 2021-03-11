@@ -73,7 +73,7 @@ class Common:
     @RetryErrors(exception=(LogsNotFound, RpcError), delay=2)
     def trigger_and_retrieve(self, log_text, function="simplelog", append_uuid=True, max_tries=6, **kwargs):
         if append_uuid:
-            log_text = f"{log_text} - {uuid.uuid1()}"
+            log_text = f"{log_text} {uuid.uuid1()}"
         self._trigger(function, log_text=log_text, **kwargs)
         filter_str = self._add_time_condition_to_filter(log_text)
         # give the command time to be received

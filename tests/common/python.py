@@ -57,11 +57,11 @@ class CommonPython:
                 f'resource.labels[{label}] is not set')
 
     def test_severity_pylogging(self):
-        severities = ['debug', 'info', 'warning', 'error', 'critical']
-        for i, severity in enumerate(severities):
-            log_text = f"{inspect.currentframe().f_code.co_name} ({i+1}/{len(severities)}) "
+        severities = ['CRITICAL', 'ERROR', 'WARNING', 'INFO', 'DEBUG']
+        for severity in severities:
+            log_text = f"{inspect.currentframe().f_code.co_name}"
             log_list = self.trigger_and_retrieve(log_text, function="pylogging", severity=severity)
-            found_resource = log_list[-1].resource
+            found_severity = log_list[-1].severity
 
-            self.assertEqual(found_resource.severity.lower(), severity.lower())
+            self.assertEqual(found_severity.lower(), severity.lower())
 
