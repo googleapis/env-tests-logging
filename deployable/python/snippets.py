@@ -39,6 +39,7 @@ def simplelog(log_name=None, log_text="simple_log", **kwargs):
 
 def pylogging(log_text="pylogging", severity="warning", **kwargs):
     # allowed severity: debug, info, warning, error, critical
+    severity = severity.lower()
     if severity == "debug":
         logging.debug(log_text)
     elif severity == "info":
