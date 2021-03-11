@@ -59,7 +59,7 @@ class CommonPython:
     def test_severity_pylogging(self):
         severities = ['debug', 'info', 'warning', 'error', 'critical']
         for i, severity in enumerate(severities):
-            log_text = f"{inspect.currentframe().f_code.co_name} ({i}/{len(severities)}) "
+            log_text = f"{inspect.currentframe().f_code.co_name} ({i+1}/{len(severities)}) "
             log_list = self.trigger_and_retrieve(log_text, function="pylogging", severity=severity)
             found_resource = log_list[-1].resource
 

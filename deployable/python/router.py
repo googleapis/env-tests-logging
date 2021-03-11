@@ -92,7 +92,7 @@ def pubsub_callback(message):
 if __name__ == "__main__":
     # set up logging
     client = google.cloud.logging.Client()
-    client.setup_logging()
+    client.setup_logging(log_level=logging.DEBUG)
 
     if os.getenv("ENABLE_SUBSCRIBER", None):
         # set up pubsub listener
