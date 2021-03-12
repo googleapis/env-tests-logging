@@ -150,3 +150,15 @@ class Common:
         for label in self.monitored_resource_labels:
             self.assertTrue(found_resource.labels[label],
                 f'resource.labels[{label}] is not set')
+
+    def test_severity(self):
+        if self.language != "python":
+            # to do: enable test for other languages
+            return True
+        severities = ['EMERGENCY', 'ALERT', 'CRITICAL', 'ERROR', 'WARNING',  'NOTICE', 'INFO', 'DEBUG', 'DEFAULT']
+        for severity in severities:
+            log_text = f"{inspect.currentframe().f_code.co_name}"
+            log_list = self.trigger_and_retrieve(log_text, severity=severity)
+            found_severity = log_list[-1].severity
+
+            self.assertEqual(found_severity.lower(), severity.lower())

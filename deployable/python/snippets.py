@@ -32,7 +32,7 @@ except ImportError:
 
 
 def simplelog(log_name=None, log_text="simple_log", severity="DEFAULT", **kwargs):
-    # allowed severity: default, debug, info, notice warning, error, critical, alert, emergency
+    # allowed severity: default, debug, info, notice, warning, error, critical, alert, emergency
     severity = severity.upper()
     client = google.cloud.logging.Client()
     logger = client.logger(log_name)
