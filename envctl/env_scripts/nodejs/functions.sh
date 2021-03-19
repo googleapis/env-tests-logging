@@ -17,7 +17,7 @@ set -e # exit on any failure
 set -o pipefail # any step in pipe caused failure
 set -u # undefined variables cause exit
 
-SERVICE_NAME="log-node-func-$(echo $ENVCTL_ID | head -c 10)"
+SERVICE_NAME="log-node-func-$(echo $ENVCTL_ID | head -c 8)"
 
 destroy() {
   set +e
@@ -47,22 +47,27 @@ deploy() {
   set +e
   gcloud pubsub topics create $SERVICE_NAME 2>/dev/null
   set -e
-  RUNTIME="${RUNTIME:-python38}"
+
+  #  TODO remove print
+  set -x
   # set up deployment directory
   # copy over local copy of library
   pushd $SUPERREPO_ROOT
-    tar -cvf $TMP_DIR/lib.tar --exclude tests --exclude .nox --exclude samples --exclude docs --exclude __pycache__ .
+    tar -cvf $TMP_DIR/lib.tar --exclude node_modules --exclude env-tests-logging --exclude test --exclude system-test --exclude .nox --exclude samples --exclude docs .
   popd
-  mkdir $TMP_DIR/python-logging
-  tar -xvf $TMP_DIR/lib.tar --directory $TMP_DIR/python-logging
-  # copy test scripts
-  cp $REPO_ROOT/deployable/python/router.py $TMP_DIR/main.py
-  cp $REPO_ROOT/deployable/python/*.py $TMP_DIR/
-  echo  "-e ./python-logging" | cat $REPO_ROOT/deployable/python/requirements.txt - > $TMP_DIR/requirements.txt
+
+  mkdir $TMP_DIR/nodejs-logging
+  tar -xvf $TMP_DIR/lib.tar --directory $TMP_DIR/nodejs-logging
+
+  # copy test code into temporary test file
+  cp $REPO_ROOT/deployable/nodejs/app.js $TMP_DIR/app.js
+  cp $REPO_ROOT/deployable/nodejs/package.json $TMP_DIR/
+
   # deploy function
+  local RUNTIME="nodejs12"
   pushd $TMP_DIR
     gcloud functions deploy $SERVICE_NAME \
-      --entry-point pubsub_gcf \
+      --entry-point pubsubFunction \
       --trigger-topic $SERVICE_NAME \
       --runtime $RUNTIME \
       --region us-west2
