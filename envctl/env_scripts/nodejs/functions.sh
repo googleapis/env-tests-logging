@@ -53,6 +53,8 @@ deploy() {
   # set up deployment directory
   # copy over local copy of library
   pushd $SUPERREPO_ROOT
+    echo "in SUPERREPO_ROOT"
+    ls
     tar -cvf $TMP_DIR/lib.tar --exclude node_modules --exclude env-tests-logging --exclude test --exclude system-test --exclude .nox --exclude samples --exclude docs .
   popd
 
@@ -66,6 +68,8 @@ deploy() {
   # deploy function
   local RUNTIME="nodejs12"
   pushd $TMP_DIR
+    echo "in TMP_DIR"
+    ls
     gcloud functions deploy $SERVICE_NAME \
       --entry-point pubsubFunction \
       --trigger-topic $SERVICE_NAME \
