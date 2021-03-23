@@ -134,22 +134,22 @@ class Common:
                 found_log = log
         self.assertIsNotNone(found_log, "expected log text not found")
 
+    # add back after v3.0.0
+    # def test_monitored_resource(self):
+    #     if self.language != "python":
+    #         # to do: add monitored resource info to go
+    #         return True
+    #     log_text = f"{inspect.currentframe().f_code.co_name}"
+    #     log_list = self.trigger_and_retrieve(log_text)
+    #     found_resource = log_list[-1].resource
 
-    def test_monitored_resource(self):
-        if self.language != "python":
-            # to do: add monitored resource info to go
-            return True
-        log_text = f"{inspect.currentframe().f_code.co_name}"
-        log_list = self.trigger_and_retrieve(log_text)
-        found_resource = log_list[-1].resource
+    #     self.assertIsNotNone(self.monitored_resource_name)
+    #     self.assertIsNotNone(self.monitored_resource_labels)
 
-        self.assertIsNotNone(self.monitored_resource_name)
-        self.assertIsNotNone(self.monitored_resource_labels)
-
-        self.assertEqual(found_resource.type, self.monitored_resource_name)
-        for label in self.monitored_resource_labels:
-            self.assertTrue(found_resource.labels[label],
-                f'resource.labels[{label}] is not set')
+    #     self.assertEqual(found_resource.type, self.monitored_resource_name)
+    #     for label in self.monitored_resource_labels:
+    #         self.assertTrue(found_resource.labels[label],
+    #             f'resource.labels[{label}] is not set')
 
     def test_severity(self):
         if self.language != "python":
