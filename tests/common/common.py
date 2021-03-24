@@ -71,7 +71,9 @@ class Common:
         self._script.run_command(Command.Trigger, [function, args_str])
 
     @RetryErrors(exception=(LogsNotFound, RpcError), delay=2)
-    def trigger_and_retrieve(self, log_text, function="simplelog", append_uuid=True, max_tries=6, **kwargs):
+    def trigger_and_retrieve(
+        self, log_text, function="simplelog", append_uuid=True, max_tries=6, **kwargs
+    ):
         if append_uuid:
             log_text = f"{log_text} {uuid.uuid1()}"
         self._trigger(function, log_text=log_text, **kwargs)
@@ -156,7 +158,16 @@ class Common:
             # to do: enable test for other languages
             return True
         log_text = f"{inspect.currentframe().f_code.co_name}"
-        severities = ['EMERGENCY', 'ALERT', 'CRITICAL', 'ERROR', 'WARNING',  'NOTICE', 'INFO', 'DEBUG']
+        severities = [
+            "EMERGENCY",
+            "ALERT",
+            "CRITICAL",
+            "ERROR",
+            "WARNING",
+            "NOTICE",
+            "INFO",
+            "DEBUG",
+        ]
         for severity in severities:
             log_list = self.trigger_and_retrieve(log_text, severity=severity)
             found_severity = log_list[-1].severity
