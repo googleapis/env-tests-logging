@@ -85,15 +85,12 @@ build_node_container() {
   docker build -t $GCR_PATH $_deployable_dir
   docker push $GCR_PATH
 
-  #TODO double check if i need this..
   rm -rf $_deployable_dir/nodejs-logging
   rm $_deployable_dir/lib.tar
 }
 
 deploy() {
-  #  TODO remove print
   set -x
-
   build_node_container
   gcloud config set run/platform managed
   gcloud config set run/region us-west1
