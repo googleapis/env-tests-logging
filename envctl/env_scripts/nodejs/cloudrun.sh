@@ -84,9 +84,6 @@ build_node_container() {
   # build container
   docker build -t $GCR_PATH $_deployable_dir
   docker push $GCR_PATH
-
-  rm -rf $_deployable_dir/nodejs-logging
-  rm $_deployable_dir/lib.tar
 }
 
 deploy() {

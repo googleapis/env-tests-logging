@@ -22,6 +22,7 @@ WORKDIR /usr/src/app
 # Copy test script and dependencies to the container image.
 COPY package*.json ./
 COPY app.js ./
+COPY tests.js ./
 COPY nodejs-logging ./nodejs-logging
 
 # Install dependencies.
