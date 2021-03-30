@@ -11,6 +11,7 @@
 // WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 // See the License for the specific language governing permissions and
 // limitations under the License.
+
 var tests = require('./tests.js');
 
 /**
@@ -19,7 +20,6 @@ var tests = require('./tests.js');
  * RUNSERVER env var is set in the Dockerfile.
  */
 if (process.env.RUNSERVER) {
-
   const express = require('express');
   const bodyParser = require('body-parser');
   const app = express();
@@ -43,15 +43,13 @@ if (process.env.RUNSERVER) {
       return;
     }
 
-    const pubSubMessage = req.body.message;
-    const name = pubSubMessage.data
-        ? Buffer.from(pubSubMessage.data, 'base64').toString().trim()
-        : 'World';
+    const message = req.body.message;
+    triggerTest(message);
 
-    console.log(`Hello ${name}!`);
     res.status(204).send();
   });
 
+  // Start app server
   const PORT = process.env.PORT || 8080;
   app.listen(PORT, () =>
       console.log(`nodejs-pubsub-tutorial listening on port ${PORT}`)
@@ -67,16 +65,20 @@ if (process.env.RUNSERVER) {
  * @param {object} context The event metadata.
  */
 exports.pubsubFunction = (message, context) => {
-  const msg = message.data
+  triggerTest(message);
+};
+
+function triggerTest(message) {
+  const testName = message.data
       ? Buffer.from(message.data, 'base64').toString()
-      : console.log("WARNING: no log function was invoked");
+      : console.error("WARNING: no log function was invoked");
 
   console.log('Fn invoked with attributes, if any: ');
   console.log(message.attributes);
 
   if (message.attributes) {
-    tests[msg](message.attributes['log_name'], message.attributes['log_text']);
+    tests[testName](message.attributes['log_name'], message.attributes['log_text']);
   } else {
-    tests[msg]();
+    tests[testName]();
   }
-};
+}
