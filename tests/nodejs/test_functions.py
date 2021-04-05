@@ -27,5 +27,5 @@ class TestCloudFunctions(Common, unittest.TestCase):
     environment = "functions"
     language = "nodejs"
 
-    monitored_resource_name = "cloud_function"
-    monitored_resource_labels = ["region", "function_name"]
+    monitored_resource_name = "project"
+    monitored_resource_labels = ["project_id"]
