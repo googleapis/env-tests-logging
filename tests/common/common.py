@@ -70,7 +70,7 @@ class Common:
         args_str = ",".join([f'{k}="{v}"' for k, v in kwargs.items()])
         self._script.run_command(Command.Trigger, [function, args_str])
 
-    @RetryErrors(exception=(LogsNotFound, RpcError), delay=2)
+    @RetryErrors(exception=(LogsNotFound, RpcError), delay=2, max_tries=2)
     def trigger_and_retrieve(
         self, log_text, function="simplelog", append_uuid=True, max_tries=6, **kwargs
     ):
@@ -81,9 +81,14 @@ class Common:
         # give the command time to be received
         tries = 0
         while tries < max_tries:
+            sleep(1)
             # retrieve resulting logs
-            log_list = self._get_logs(filter_str)
-            return log_list
+            try:
+                log_list = self._get_logs(filter_str)
+                return log_list
+            except (LogsNotFound, RpcError) as e:
+                sleep(5)
+                tries += 1
         # log not found
         raise LogsNotFound
 
