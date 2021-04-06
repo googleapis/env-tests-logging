@@ -65,38 +65,38 @@ class CommonPython:
     def test_source_location_pylogging(self):
         log_text = f"{inspect.currentframe().f_code.co_name}"
         log_list = self.trigger_and_retrieve(log_text, function="pylogging")
-        found_resource = log_list[-1].resource
+        found_source = log_list[-1].source_location
 
-        self.assertIsNotNone(found_resource.source_location)
-        self.assertIsNotNone(found_resource.source_location['file'])
-        self.assertIsNotNone(found_resource.source_location['function'])
-        self.assertIsNotNone(found_resource.source_location['line'])
-        self.assertEqual(found_resource.source_location['file'], "/workspace/snippets.py")
-        self.assertEqual(found_resource.source_location['function'], "pylogging")
-        self.assertTrue(int(found_resource.source_location['line']) > 0)
+        self.assertIsNotNone(found_ource)
+        self.assertIsNotNone(found_source['file'])
+        self.assertIsNotNone(found_source['function'])
+        self.assertIsNotNone(found_source['line'])
+        self.assertEqual(found_source['file'], "/workspace/snippets.py")
+        self.assertEqual(found_source['function'], "pylogging")
+        self.assertTrue(int(found_source['line']) > 0)
 
     def test_flask_http_request_pylogging(self):
         log_text = f"{inspect.currentframe().f_code.co_name}"
 
         expected_agent = "test-agent"
-        exected_base_url = "http://test"
+        expected_base_url = "http://test"
         expected_path = "/pylogging"
         expected_trace = "123"
 
         log_list = self.trigger_and_retrieve(log_text, function="pylogging_flask",
-                path=expected_path, trace=expected_trace, base_url=exected_base_url, agent=expected_agent)
-        found_resource = log_list[-1].resource
+                path=expected_path, trace=expected_trace, base_url=expected_base_url, agent=expected_agent)
+        found_request = log_list[-1].http_request
 
-        print(found_resource.trace)
-        print(found_resource.http_request)
-        self.assertIsNotNone(found_resource.trace)
-        self.assertIsNotNone(found_resource.httpRequest)
-        self.assertIsNotNone(found_resource.httpRequest['requestMethod'])
-        self.assertIsNotNone(found_resource.httpRequest['requestUrl'])
-        self.assertIsNotNone(found_resource.httpRequest['userAgent'])
-        self.assertIsNotNone(found_resource.httpRequest['protocol'])
-        # self.assertEqual(found_resource.trace, expected_trace)
-        self.assertEqual(found_resource.httpRequest['requestMethod'], 'GET')
-        self.assertEqual(found_resource.httpRequest['requestUrl'], expected_base_url + expected_path)
-        self.assertEqual(found_resource.httpRequest['userAgent'], expected_agent)
-        self.assertEqual(found_resource.httpRequest['protocol'], 'HTTP/1.1')
+        self.assertIsNotNone(found_request)
+        self.assertIsNotNone(found_request['requestMethod'])
+        self.assertIsNotNone(found_request['requestUrl'])
+        self.assertIsNotNone(found_request['userAgent'])
+        self.assertIsNotNone(found_request['protocol'])
+        self.assertEqual(found_request['requestMethod'], 'GET')
+        self.assertEqual(found_request['requestUrl'], expected_base_url + expected_path)
+        self.assertEqual(found_request['userAgent'], expected_agent)
+        self.assertEqual(found_request['protocol'], 'HTTP/1.1')
+
+        found_trace = log_list[-1].trace
+        self.assertIsNotNone(found_trace)
+        self.assertIn("projects/", found_trace)

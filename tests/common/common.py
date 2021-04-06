@@ -77,11 +77,11 @@ class Common:
         if append_uuid:
             log_text = f"{log_text} {uuid.uuid1()}"
         self._trigger(function, log_text=log_text, **kwargs)
+        sleep(2)
         filter_str = self._add_time_condition_to_filter(log_text)
         # give the command time to be received
         tries = 0
         while tries < max_tries:
-            sleep(1)
             # retrieve resulting logs
             try:
                 log_list = self._get_logs(filter_str)
