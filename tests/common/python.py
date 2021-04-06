@@ -63,6 +63,9 @@ class CommonPython:
             self.assertEqual(found_severity.lower(), severity.lower())
 
     def test_source_location_pylogging(self):
+        if environment == "kubernetes":
+            # todo: enable in v3.0.0
+            return
         log_text = f"{inspect.currentframe().f_code.co_name}"
         log_list = self.trigger_and_retrieve(log_text, function="pylogging")
         found_source = log_list[-1].source_location
@@ -76,6 +79,9 @@ class CommonPython:
         self.assertTrue(int(found_source['line']) > 0)
 
     def test_flask_http_request_pylogging(self):
+        if environment == "kubernetes":
+            # todo: enable in v3.0.0
+            return
         log_text = f"{inspect.currentframe().f_code.co_name}"
 
         expected_agent = "test-agent"
