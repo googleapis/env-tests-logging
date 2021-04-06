@@ -71,7 +71,7 @@ class CommonPython:
         self.assertIsNotNone(found_source['file'])
         self.assertIsNotNone(found_source['function'])
         self.assertIsNotNone(found_source['line'])
-        self.assertEqual(found_source['file'], "/workspace/snippets.py")
+        self.assertIn("snippets.py", found_source['file'])
         self.assertEqual(found_source['function'], "pylogging")
         self.assertTrue(int(found_source['line']) > 0)
 
