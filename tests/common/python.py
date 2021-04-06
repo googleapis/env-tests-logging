@@ -61,3 +61,16 @@ class CommonPython:
             found_severity = log_list[-1].severity
 
             self.assertEqual(found_severity.lower(), severity.lower())
+
+    def test_source_location_pylogging(self):
+        log_text = f"{inspect.currentframe().f_code.co_name}"
+        log_list = self.trigger_and_retrieve(log_text, function="pylogging")
+        found_resource = log_list[-1].resource
+
+        self.assertIsNotNone(found_resource.source_location)
+        self.assertIsNotNone(found_resource.source_location['file'])
+        self.assertIsNotNone(found_resource.source_location['function'])
+        self.assertIsNotNone(found_resource.source_location['line'])
+        self.assertEqual(found_resource.source_location['file'], "snippets.py")
+        self.assertEqual(found_resource.source_location['function'], "pylogging")
+        self.assertTrue(found_resource.source_location['line'] > 0)
