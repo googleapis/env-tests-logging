@@ -53,7 +53,7 @@ def pylogging(log_text="pylogging", severity="WARNING", **kwargs):
     else:
         logging.critical(log_text)
 
-def pylogging_flask(log_text="pylogging_flask", path="/", base_url="google", agent="Chrome", trace="123", **kwargs):
+def pylogging_flask(log_text="pylogging_flask", path="/", base_url="http://google", agent="Chrome", trace="123", **kwargs):
     import flask
     app = flask.Flask(__name__)
     with app.test_request_context(
