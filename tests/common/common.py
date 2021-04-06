@@ -82,12 +82,8 @@ class Common:
         tries = 0
         while tries < max_tries:
             # retrieve resulting logs
-            try:
-                log_list = self._get_logs(filter_str)
-                return log_list
-            except (LogsNotFound, RpcError) as e:
-                sleep(10)
-                tries += 1
+            log_list = self._get_logs(filter_str)
+            return log_list
         # log not found
         raise LogsNotFound
 
