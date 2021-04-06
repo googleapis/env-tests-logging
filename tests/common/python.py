@@ -67,7 +67,7 @@ class CommonPython:
         log_list = self.trigger_and_retrieve(log_text, function="pylogging")
         found_source = log_list[-1].source_location
 
-        self.assertIsNotNone(found_ource)
+        self.assertIsNotNone(found_source)
         self.assertIsNotNone(found_source['file'])
         self.assertIsNotNone(found_source['function'])
         self.assertIsNotNone(found_source['line'])
