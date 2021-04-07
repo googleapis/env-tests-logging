@@ -63,7 +63,8 @@ class CommonPython:
             self.assertEqual(found_severity.lower(), severity.lower())
 
     def test_source_location_pylogging(self):
-        if self.environment == "kubernetes":
+        if self.environment == "kubernetes" or "appengine" in self.environment:
+            # disable these tests on environments with custom handlers
             # todo: enable in v3.0.0
             return
         log_text = f"{inspect.currentframe().f_code.co_name}"
@@ -79,7 +80,8 @@ class CommonPython:
         self.assertTrue(int(found_source['line']) > 0)
 
     def test_flask_http_request_pylogging(self):
-        if self.environment == "kubernetes":
+        if self.environment == "kubernetes" or "appengine" in self.environment:
+            # disable these tests on environments with custom handlers
             # todo: enable in v3.0.0
             return
         log_text = f"{inspect.currentframe().f_code.co_name}"
