@@ -24,7 +24,7 @@ from ..common.common import Common
 class CommonPython:
     def pylogging_test_receive_log(self):
         log_text = f"{inspect.currentframe().f_code.co_name}"
-        log_list = self.trigger_and_retrieve(log_text, function="pylogging")
+        log_list = self.trigger_and_retrieve(log_text, "pylogging")
 
         found_log = None
         for log in log_list:
@@ -39,7 +39,7 @@ class CommonPython:
 
     def test_monitored_resource_pylogging(self):
         log_text = f"{inspect.currentframe().f_code.co_name}"
-        log_list = self.trigger_and_retrieve(log_text, function="pylogging")
+        log_list = self.trigger_and_retrieve(log_text, "pylogging")
         found_resource = log_list[-1].resource
 
         self.assertIsNotNone(self.monitored_resource_name)
@@ -56,7 +56,7 @@ class CommonPython:
         for severity in severities:
             log_text = f"{inspect.currentframe().f_code.co_name}"
             log_list = self.trigger_and_retrieve(
-                log_text, function="pylogging", severity=severity
+                log_text, "pylogging", severity=severity
             )
             found_severity = log_list[-1].severity
 
@@ -68,7 +68,7 @@ class CommonPython:
             # todo: enable in v3.0.0
             return
         log_text = f"{inspect.currentframe().f_code.co_name}"
-        log_list = self.trigger_and_retrieve(log_text, function="pylogging")
+        log_list = self.trigger_and_retrieve(log_text, "pylogging")
         found_source = log_list[-1].source_location
 
         self.assertIsNotNone(found_source)
@@ -91,7 +91,7 @@ class CommonPython:
         expected_path = "/pylogging"
         expected_trace = "123"
 
-        log_list = self.trigger_and_retrieve(log_text, function="pylogging_flask",
+        log_list = self.trigger_and_retrieve(log_text, "pylogging_flask",
                 path=expected_path, trace=expected_trace, base_url=expected_base_url, agent=expected_agent)
         found_request = log_list[-1].http_request
 
