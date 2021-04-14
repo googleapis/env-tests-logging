@@ -108,3 +108,35 @@ class CommonPython:
         found_trace = log_list[-1].trace
         self.assertIsNotNone(found_trace)
         self.assertIn("projects/", found_trace)
+
+    def test_pylogging_extras(self):
+        log_text = f"{inspect.currentframe().f_code.co_name}"
+        kwargs = {
+            'trace': '123',
+            'requestMethod': 'POST',
+            'requestUrl': 'http://test',
+            'userAgent': 'agent',
+            'protocol': 'test',
+            'line': 25,
+            'file': 'test-file',
+            'function': 'test-function'
+        }
+        log_list = self.trigger_and_retrieve(log_text, "pylogging", **kwargs)
+        found_log = log_list[-1]
+
+        self.assertEqual(found_log.trace, kwargs['trace'])
+
+        # check that custom http request fields were set
+        self.assertIsNotNone(found_log.http_request)
+        for field in ['requestMethod', 'requestUrl', 'userAgent', 'protocol']:
+            self.assertIsNotNone(found_log.http_request[field],
+                    'http_request[{field}] is unexpectedly None')
+            self.assertEqual(found_log.http_request[field], kwargs[field],
+                    f'http_request[{field}] != {kwargs[field]}')
+        # check that custom source location fields were set
+        self.assertIsNotNone(found_log.source_location)
+        for field in ['line', 'file', 'function']:
+            self.assertIsNotNone(found_log.source_location[field],
+                    'source_location[{field}] is unexpectedly None')
+            self.assertEqual(found_log.source_location[field], kwargs[field],
+                    f'source_location[{field}] != {kwargs[field]}')
