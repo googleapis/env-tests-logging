@@ -59,7 +59,6 @@ def pylogging(log_text="pylogging", severity="WARNING", **kwargs):
                 source_location[key] = kwargs[key]
         kwargs['source_location'] = source_location
 
-    logging.debug(kwargs)
     severity = severity.upper()
     if severity == "DEBUG":
         logging.debug(log_text, extra=kwargs)
