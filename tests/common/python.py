@@ -128,7 +128,9 @@ class CommonPython:
         log_list = self.trigger_and_retrieve(log_text, "pylogging", **kwargs)
         found_log = log_list[-1]
 
-        self.assertEqual(found_log.trace, kwargs['trace'])
+        if self.environment != "functions":
+            # functions seems to override the user's trace value
+            self.assertEqual(found_log.trace, kwargs['trace'])
 
         # check that custom http request fields were set
         self.assertIsNotNone(found_log.http_request)
