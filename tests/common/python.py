@@ -123,7 +123,7 @@ class CommonPython:
             'protocol': 'test',
             'line': 25,
             'file': 'test-file',
-            'function': 'test-function'
+            'function': 'test-function',
             'label_custom': 'test-label',
         }
         log_list = self.trigger_and_retrieve(log_text, "pylogging", **kwargs)
