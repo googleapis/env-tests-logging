@@ -124,6 +124,7 @@ class CommonPython:
             'line': 25,
             'file': 'test-file',
             'function': 'test-function'
+            'label_custom': 'test-label',
         }
         log_list = self.trigger_and_retrieve(log_text, "pylogging", **kwargs)
         found_log = log_list[-1]
@@ -146,6 +147,9 @@ class CommonPython:
                     f'source_location[{field}] is unexpectedly None')
             self.assertEqual(found_log.source_location[field], kwargs[field],
                     f'source_location[{field}] != {kwargs[field]}')
+        # check that custom label is set
+        self.assertIsNotNone(found_log.labels)
+        self.assertEqual(found_log.labels['custom'], kwargs['label_custom'])
 
     def test_pylogging_extras_sparse(self):
         if self.environment == "kubernetes" or "appengine" in self.environment:
