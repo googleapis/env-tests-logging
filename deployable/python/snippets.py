@@ -60,7 +60,7 @@ def pylogging(log_text="pylogging", severity="WARNING", **kwargs):
         kwargs['source_location'] = source_location
     # build custom labels
     label_prefix = "label_"
-    label_keys = [k in kwargs.keys() if k.startswith(label_prefix)]
+    label_keys = [k for k in kwargs.keys() if k.startswith(label_prefix)]
     if label_keys:
         labels = {}
         for k in label_keys:
