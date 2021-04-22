@@ -72,7 +72,6 @@ EOF
   # deploy
   pushd $TMP_DIR
     gcloud app deploy -q
-    gcloud app browse --no-launch-browser -q
   popd
   # wait for the pub/sub subscriber to start
   NUM_SUBSCRIBERS=0
