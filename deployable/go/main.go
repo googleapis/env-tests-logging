@@ -18,20 +18,22 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
+	"io"
 	"io/ioutil"
 	"log"
 	"net/http"
 	"os"
-	"sync"
 	"time"
 
-	// This is replaced by the local version of cloud logging
 	"cloud.google.com/go/compute/metadata"
+	// go/logging is replaced by the local version of cloud logging
 	"cloud.google.com/go/logging"
 	"cloud.google.com/go/pubsub"
+	"google.golang.org/grpc/codes"
+	"google.golang.org/grpc/status"
 )
 
-// PubSubMessage is the message format received over HTTP
+// pubSubMessage is the message format received over HTTP
 // ****************** CloudRun ******************
 type pubSubMessage struct {
 	Message struct {
@@ -42,7 +44,7 @@ type pubSubMessage struct {
 	Subscription string `json:"subscription"`
 }
 
-// CloudRun: Processes a Pub/Sub message through HTTP.
+// pubsubHTTP processes a Pub/Sub message through HTTP.
 // ****************** CloudRun ******************
 func pubsubHTTP(w http.ResponseWriter, r *http.Request) {
 	var m pubSubMessage
@@ -60,15 +62,7 @@ func pubsubHTTP(w http.ResponseWriter, r *http.Request) {
 
 	msg := string(m.Message.Data)
 	args := m.Message.Attributes
-
-	switch msg {
-	case "simplelog":
-		simplelog(args)
-	case "stdLog":
-		break
-	default:
-		break
-	}
+	testLog(msg, args)
 }
 
 // PubSubMessage is the message format received by CloudFunctions
@@ -82,101 +76,116 @@ type PubSubMessage struct {
 // ****************** Functions ******************
 func PubsubFunction(ctx context.Context, m PubSubMessage) error {
 	log.Printf("Data is: %v", string(m.Data))
-	switch string(m.Data) {
-	case "simplelog":
-		simplelog(m.Attributes)
-		break
-	case "stdlog":
-		break
-	default:
-		break
-	}
+	testLog(string(m.Data), m.Attributes)
 	return nil
 }
 
-// pullPubsubMsgs is a async pubsub pull for app envs with subscriber configured
-// ****************** GAE, TBA ******************
-func pullPubsubMsgs(projectID string, sub *pubsub.Subscription) error {
-	var mu sync.Mutex
-	received := 0
-	cctx, cancel := context.WithCancel(ctx)
-	err := sub.Receive(cctx, func(ctx context.Context, msg *pubsub.Message) {
-		mu.Lock()
-		defer mu.Unlock()
-		fmt.Printf("Got message: %q\n", string(msg.Data))
-		msg.Ack()
-		received++
-		// Consume 1 message only.
-		if received == 1 {
-			cancel()
-		}
-	})
+// pullMsgsSync synchronously pulls pubsub messages for a maximum of 2400 seconds
+// ****************** App Engine ******************
+func pullMsgsSync(w io.Writer, projectID, subID string) error {
+	ctx := context.Background()
+	client, err := pubsub.NewClient(ctx, projectID)
 	if err != nil {
+		return fmt.Errorf("pubsub.NewClient: %v", err)
+	}
+	defer client.Close()
+
+	sub := client.Subscription(subID)
+
+	// Turn on synchronous mode. This makes the subscriber use the Pull RPC rather
+	// than the StreamingPull RPC, which is useful for guaranteeing MaxOutstandingMessages,
+	// the max number of messages the client will hold in memory at a time.
+	sub.ReceiveSettings.Synchronous = true
+	sub.ReceiveSettings.MaxOutstandingMessages = 10
+
+	// Receive messages for 1000 seconds.
+	ctx, cancel := context.WithTimeout(ctx, 2400*time.Second)
+	defer cancel()
+
+	// Create a channel to handle messages to as they come in.
+	cm := make(chan *pubsub.Message)
+	defer close(cm)
+	// Handle individual messages in a goroutine.
+	go func() {
+		for msg := range cm {
+			fmt.Fprintf(w, "Got message :%q\n", string(msg.Data))
+			testLog(string(msg.Data), msg.Attributes)
+			msg.Ack()
+		}
+	}()
+
+	// Receive blocks until the passed in context is done.
+	err = sub.Receive(ctx, func(ctx context.Context, msg *pubsub.Message) {
+		cm <- msg
+	})
+	if err != nil && status.Code(err) != codes.Canceled {
 		return fmt.Errorf("Receive: %v", err)
 	}
+
 	return nil
 }
 
+// Initializations for all GCP services
 var ctx context.Context
 
-// client *logging.Client
+// TODO client *logging.Client
 
 // init executes for all environments, regardless if its a program or package
-// TODO: verify that init executes for cloud functions.
 func init() {
 	ctx = context.Background()
 }
 
 // main runs for all environments except GCF
 func main() {
-	fmt.Println("Application main() executed")
-
+	// ****************** GAE ******************
 	if os.Getenv("ENABLE_SUBSCRIBER") == "true" {
-		// ****************** GAE ******************
-		fmt.Println("in block: GAE ")
 		projectID, err := metadata.ProjectID()
 		if err != nil {
 			log.Fatalf("metadata.ProjectID: %v", err)
 		}
-		fmt.Println("projectID: " + projectID)
 		topicID := os.Getenv("PUBSUB_TOPIC")
 		if topicID == "" {
 			topicID = "logging-test"
 		}
-		fmt.Println("topicID: " + topicID)
 		client, err := pubsub.NewClient(ctx, projectID)
 		if err != nil {
 			log.Fatalf("pubsub.NewClient: %v", err)
 		}
+		defer client.Close()
 		subscriptionID := topicID + "-subscriber"
 		topic := client.Topic(topicID)
-		sub, err := client.CreateSubscription(ctx, subscriptionID, pubsub.SubscriptionConfig{
-			Topic:       topic,
-			AckDeadline: 20 * time.Second,
-		})
+
+		// Create a pull subscription to receive messages
+		_, err = client.CreateSubscription(ctx,
+			subscriptionID,
+			pubsub.SubscriptionConfig{
+				Topic: topic,
+			})
 		if err != nil {
-			log.Fatalf("CreateSubscription: %v", err)
+			log.Fatalf("pubsub.CreateSubscription: %v", err)
 		}
-		err = pullPubsubMsgs(projectID, sub)
+
+		// Blocking call, pulls messages from pubsub until context is cancelled or test ends
+		err = pullMsgsSync(os.Stdout, projectID, subscriptionID)
 		if err != nil {
-			log.Fatalf("pullPubsubMsgs: %v", err)
+			log.Fatalf("pullMsgsSync failed: %v", err)
 		}
 	}
 
 	// ****************** CloudRun ******************
+	_, isCloudRun := os.LookupEnv("K_CONFIGURATION")
+	if isCloudRun {
+		http.HandleFunc("/", pubsubHTTP)
 
-	http.HandleFunc("/", pubsubHTTP)
-
-	// ****************** CloudRun & AppEngine ******************
-
-	port := os.Getenv("PORT")
-	if port == "" {
-		port = "8080"
-		log.Printf("Defaulting to port %s", port)
-	}
-	log.Printf("Listening on port %s", port)
-	if err := http.ListenAndServe(":"+port, nil); err != nil {
-		log.Fatal(err)
+		port := os.Getenv("PORT")
+		if port == "" {
+			port = "8080"
+			log.Printf("Defaulting to port %s", port)
+		}
+		log.Printf("Listening on port %s", port)
+		if err := http.ListenAndServe(":"+port, nil); err != nil {
+			log.Fatal(err)
+		}
 	}
 }
 
@@ -207,4 +216,16 @@ func simplelog(args map[string]string) {
 
 	logger := client.Logger(logname).StandardLogger(logging.Info)
 	logger.Println(logtext)
+}
+
+// testLog is a helper function which invokes the correct test functions
+func testLog(message string, attrs map[string]string) {
+	switch message {
+	case "simplelog":
+		simplelog(attrs)
+	case "stdlog":
+		break
+	default:
+		break
+	}
 }
