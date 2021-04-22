@@ -48,11 +48,11 @@ build_go_container() {
   _deployable_dir=$REPO_ROOT/deployable/$LANGUAGE
 
   # copy over local copy of library
-  pushd $SUPERREPO_ROOT
+  pushd $SUPERREPO_ROOT/logging
     tar -cvf $_deployable_dir/lib.tar --exclude internal/env-tests-logging --exclude .nox --exclude docs --exclude __pycache__ .
   popd
-  mkdir -p $_deployable_dir/$LIBRARY_NAME
-  tar -xvf $_deployable_dir/lib.tar --directory $_deployable_dir/$LIBRARY_NAME
+  mkdir -p $_deployable_dir/logging
+  tar -xvf $_deployable_dir/lib.tar --directory $_deployable_dir/logging
   # build container
   docker build -t $GCR_PATH $_deployable_dir
   docker push $GCR_PATH
