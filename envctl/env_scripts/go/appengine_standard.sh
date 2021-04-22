@@ -17,8 +17,7 @@ set -e # exit on any failure
 set -o pipefail # any step in pipe caused failure
 set -u # undefined variables cause exit
 
-
-SERVICE_NAME="logging-py-standard-$(echo $ENVCTL_ID | head -c 10)"\
+SERVICE_NAME="logging-go-standard-$(echo $ENVCTL_ID | head -c 8)"\
 
 destroy() {
   set +e
@@ -47,22 +46,22 @@ deploy() {
   # create pub/sub topic
   set +e
   gcloud pubsub topics create $SERVICE_NAME 2>/dev/null
-  set -e
+  set -ex
   # set up deployment directory
   # copy over local copy of library
-  pushd $SUPERREPO_ROOT
-    tar -cvf $TMP_DIR/lib.tar --exclude tests --exclude .nox --exclude samples --exclude docs --exclude __pycache__ .
+  pushd $SUPERREPO_ROOT/logging
+    tar -cvf $TMP_DIR/lib.tar --exclude .git/ --exclude internal/env-tests-logging --exclude .nox --exclude docs --exclude __pycache__ .
   popd
-  mkdir $TMP_DIR/python-logging
-  tar -xvf $TMP_DIR/lib.tar --directory $TMP_DIR/python-logging
-  # copy test scripts
-  cp $REPO_ROOT/deployable/python/*.py $TMP_DIR
-  echo  "-e ./python-logging" | cat $REPO_ROOT/deployable/python/requirements.txt - > $TMP_DIR/requirements.txt
-  # build app.yaml
+  mkdir $TMP_DIR/logging
+  tar -xvf $TMP_DIR/lib.tar --directory $TMP_DIR/logging
+  # copy test code and Go dependencies
+  cp $REPO_ROOT/deployable/go/*.go $TMP_DIR
+  cp $REPO_ROOT/deployable/go/go.* $TMP_DIR
+
+  # manual_scaling allows 1 instance to continuously run regardless of the load level.
   cat <<EOF > $TMP_DIR/app.yaml
-    runtime: python37
+    runtime: go115
     service: $SERVICE_NAME
-    entrypoint: python router.py
     manual_scaling:
       instances: 1
     env_variables:
@@ -72,7 +71,7 @@ EOF
   # deploy
   pushd $TMP_DIR
     gcloud app deploy -q
-    gcloud app browse --no-launch-browser -q
+    # gcloud app browse --no-launch-browser -q
   popd
   # wait for the pub/sub subscriber to start
   NUM_SUBSCRIBERS=0
@@ -87,6 +86,3 @@ EOF
 filter-string() {
   echo "resource.type=\"gae_app\" AND resource.labels.module_id=\"$SERVICE_NAME\""
 }
-
-
-
