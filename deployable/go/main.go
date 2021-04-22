@@ -18,7 +18,6 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
-	"io"
 	"io/ioutil"
 	"log"
 	"net/http"
@@ -82,19 +81,9 @@ func PubsubFunction(ctx context.Context, m PubSubMessage) error {
 
 // pullMsgsSync synchronously pulls pubsub messages for a maximum of 2400 seconds
 // ****************** App Engine ******************
-func pullMsgsSync(w io.Writer, projectID, subID string) error {
-	ctx := context.Background()
-	client, err := pubsub.NewClient(ctx, projectID)
-	if err != nil {
-		return fmt.Errorf("pubsub.NewClient: %v", err)
-	}
-	defer client.Close()
-
-	sub := client.Subscription(subID)
-
+func pullMsgsSync(sub *pubsub.Subscription) error {
 	// Turn on synchronous mode. This makes the subscriber use the Pull RPC rather
-	// than the StreamingPull RPC, which is useful for guaranteeing MaxOutstandingMessages,
-	// the max number of messages the client will hold in memory at a time.
+	// than the StreamingPull RPC, which is useful for guaranteeing MaxOutstandingMessages.
 	sub.ReceiveSettings.Synchronous = true
 	sub.ReceiveSettings.MaxOutstandingMessages = 10
 
@@ -108,20 +97,18 @@ func pullMsgsSync(w io.Writer, projectID, subID string) error {
 	// Handle individual messages in a goroutine.
 	go func() {
 		for msg := range cm {
-			fmt.Fprintf(w, "Got message :%q\n", string(msg.Data))
+			log.Printf("Got message :%q\n", string(msg.Data))
 			testLog(string(msg.Data), msg.Attributes)
 			msg.Ack()
 		}
 	}()
-
 	// Receive blocks until the passed in context is done.
-	err = sub.Receive(ctx, func(ctx context.Context, msg *pubsub.Message) {
+	err := sub.Receive(ctx, func(ctx context.Context, msg *pubsub.Message) {
 		cm <- msg
 	})
 	if err != nil && status.Code(err) != codes.Canceled {
-		return fmt.Errorf("Receive: %v", err)
+		return fmt.Errorf("receive: %v", err)
 	}
-
 	return nil
 }
 
@@ -154,7 +141,7 @@ func main() {
 		topic := client.Topic(topicID)
 
 		// Create a pull subscription to receive messages
-		_, err = client.CreateSubscription(ctx,
+		sub, err := client.CreateSubscription(ctx,
 			subscriptionID,
 			pubsub.SubscriptionConfig{
 				Topic: topic,
@@ -164,7 +151,7 @@ func main() {
 		}
 
 		// Blocking call, pulls messages from pubsub until context is cancelled or test ends
-		err = pullMsgsSync(os.Stdout, projectID, subscriptionID)
+		err = pullMsgsSync(sub)
 		if err != nil {
 			log.Fatalf("pullMsgsSync failed: %v", err)
 		}
