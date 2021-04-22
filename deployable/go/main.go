@@ -128,8 +128,6 @@ func pullMsgsSync(w io.Writer, projectID, subID string) error {
 // Initializations for all GCP services
 var ctx context.Context
 
-// TODO client *logging.Client
-
 // init executes for all environments, regardless if its a program or package
 func init() {
 	ctx = context.Background()
@@ -192,7 +190,6 @@ func main() {
 // ****************** Test Cases ******************
 // [Optional] envctl go <env> trigger simplelog log_name=foo,log_text=bar
 func simplelog(args map[string]string) {
-	// TODO: refactor this contx, use the global one if it doesn't exist, reinitiate.
 	ctx := context.Background()
 	projectID, err := metadata.ProjectID()
 	if err != nil {
