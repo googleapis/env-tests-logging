@@ -130,7 +130,7 @@ class CommonPython:
         log_text = f"{inspect.currentframe().f_code.co_name}"
         kwargs = {
             "trace": "123",
-            "spanId": "456",
+            "span_id": "456",
             "requestMethod": "POST",
             "requestUrl": "http://test",
             "userAgent": "agent",
@@ -146,7 +146,7 @@ class CommonPython:
         if self.environment != "functions":
             # functions seems to override the user's trace value
             self.assertEqual(found_log.trace, kwargs["trace"])
-            self.assertEqual(found_log.span_id, kwargs["spanId"])
+            self.assertEqual(found_log.span_id, kwargs["span_id"])
 
         # check that custom http request fields were set
         self.assertIsNotNone(found_log.http_request)
