@@ -22,7 +22,7 @@ from ..common.common import Common
 
 
 class CommonPython:
-    def pylogging_test_receive_log(self):
+    def test_pylogging_receive_log(self):
         log_text = f"{inspect.currentframe().f_code.co_name}"
         log_list = self.trigger_and_retrieve(log_text, "pylogging")
 
@@ -36,6 +36,21 @@ class CommonPython:
             if message and log_text in message:
                 found_log = log
         self.assertIsNotNone(found_log, "expected log text not found")
+
+    def test_pylogging_receive_unicode_log(self):
+        log_text = f"{inspect.currentframe().f_code.co_name} 嗨 世界 😀"
+        log_list = self.trigger_and_retrieve(log_text, "pylogging")
+
+        found_log = None
+        for log in log_list:
+            message = (
+                log.payload.get("message", None)
+                if isinstance(log.payload, dict)
+                else str(log.payload)
+            )
+            if message and log_text in message:
+                found_log = log
+        self.assertIsNotNone(found_log, "expected unicode log not found")
 
     def test_monitored_resource_pylogging(self):
         log_text = f"{inspect.currentframe().f_code.co_name}"
