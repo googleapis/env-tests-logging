@@ -58,7 +58,7 @@ class Common:
 
     def _get_logs(self, filter_str=None):
         if not filter_str:
-            _, filter_str = self._script.run_command(Command.GetFilter)
+            _, filter_str, _ = self._script.run_command(Command.GetFilter)
         iterator = self._client.list_entries(filter_=filter_str)
         entries = list(iterator)
         if not entries:
@@ -99,21 +99,21 @@ class Common:
             raise NotImplementedError("language not set by subclass")
         cls._script = ScriptRunner(cls.environment, cls.language)
         # check if already setup
-        status, _ = cls._script.run_command(Command.Verify)
+        status, _, _ = cls._script.run_command(Command.Verify)
         if status == 0:
             if os.getenv("NO_CLEAN"):
                 # ready to go
                 return
             else:
                 # reset environment
-                status, _ = cls._script.run_command(Command.Destroy)
+                status, _, _ = cls._script.run_command(Command.Destroy)
                 assert status == 0
         # deploy test code to GCE
-        status, output = cls._script.run_command(Command.Deploy)
+        status, _, err = cls._script.run_command(Command.Deploy)
         if status != 0:
-            print(output)
+            print(err)
         # verify code is running
-        status, output = cls._script.run_command(Command.Verify)
+        status, _, err = cls._script.run_command(Command.Verify)
         if status != 0:
             print(output)
         assert status == 0

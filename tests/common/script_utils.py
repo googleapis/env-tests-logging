@@ -59,9 +59,8 @@ class ScriptRunner:
             print(full_command)
             result = subprocess.run(full_command, capture_output=True)
             complete = True
-            return result.returncode, result.stdout.decode("utf-8")
+            return result.returncode, result.stdout.decode("utf-8"), result.stderr.decode("utf-8")
         except Exception as e:
-            print(result.stdout)
             print(e)
         finally:
             if not complete:
