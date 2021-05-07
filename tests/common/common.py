@@ -109,9 +109,13 @@ class Common:
                 status, _ = cls._script.run_command(Command.Destroy)
                 assert status == 0
         # deploy test code to GCE
-        status, _ = cls._script.run_command(Command.Deploy)
+        status, output = cls._script.run_command(Command.Deploy)
+        if status != 0:
+            print(output)
         # verify code is running
-        status, _ = cls._script.run_command(Command.Verify)
+        status, output = cls._script.run_command(Command.Verify)
+        if status != 0:
+            print(output)
         assert status == 0
 
     @classmethod
