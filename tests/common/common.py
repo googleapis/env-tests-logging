@@ -115,7 +115,7 @@ class Common:
         # verify code is running
         status, _, err = cls._script.run_command(Command.Verify)
         if status != 0:
-            print(output)
+            print(err)
         assert status == 0
 
     @classmethod
