@@ -20,7 +20,6 @@ set -u # undefined variables cause exit
 # Note: there is a max character count constraint
 SERVICE_NAME="log-go-run-$(echo $ENVCTL_ID | head -c 8)x"
 SA_NAME=$SERVICE_NAME-invoker
-LIBRARY_NAME="google-cloud-go"
 
 add_service_accounts() {
   set +e

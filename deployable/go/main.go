@@ -122,7 +122,7 @@ func init() {
 
 // main runs for all environments except GCF
 func main() {
-	// ****************** GAE ******************
+	// ****************** GAE, GKE ******************
 	if os.Getenv("ENABLE_SUBSCRIBER") == "true" {
 		projectID, err := metadata.ProjectID()
 		if err != nil {
@@ -157,10 +157,14 @@ func main() {
 		}
 	}
 
-	// ****************** CloudRun ******************
+	// ****************** CloudRun, GKE ******************
 	_, isCloudRun := os.LookupEnv("K_CONFIGURATION")
-	if isCloudRun {
-		http.HandleFunc("/", pubsubHTTP)
+	_, isKubernetes := os.LookupEnv("IS_GKE") // set in gke.yml
+
+	if isCloudRun || isKubernetes {
+		if isCloudRun {
+			http.HandleFunc("/", pubsubHTTP)
+		}
 
 		port := os.Getenv("PORT")
 		if port == "" {
