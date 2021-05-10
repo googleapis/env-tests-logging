@@ -122,7 +122,8 @@ func init() {
 
 // main runs for all environments except GCF
 func main() {
-	// ****************** GAE, GKE ******************
+	// ****************** GAE, GKE, GCE ******************
+	// Enable app subscriber for all environments except GCR
 	if os.Getenv("ENABLE_SUBSCRIBER") == "true" {
 		projectID, err := metadata.ProjectID()
 		if err != nil {
@@ -157,11 +158,15 @@ func main() {
 		}
 	}
 
-	// ****************** CloudRun, GKE ******************
+	// ****************** GCR, GKE, GCE ******************
+	// Listen and serve for all environments except GAE
+	_, gaeApp := os.LookupEnv("GAE_SERVICE")
+	_, gaeRuntime := os.LookupEnv("GAE_VERSION")
+	isAppEngine := gaeApp || gaeRuntime
 	_, isCloudRun := os.LookupEnv("K_CONFIGURATION")
-	_, isKubernetes := os.LookupEnv("IS_GKE") // set in gke.yml
 
-	if isCloudRun || isKubernetes {
+	if !isAppEngine {
+		// Cloud run is triggered through http handler
 		if isCloudRun {
 			http.HandleFunc("/", pubsubHTTP)
 		}

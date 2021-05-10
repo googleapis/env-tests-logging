@@ -17,9 +17,8 @@ set -e # exit on any failure
 set -o pipefail # any step in pipe caused failure
 set -u # undefined variables cause exit
 
-# Note: there is a max character count constraint
-SERVICE_NAME="log-go-gke-$(echo $ENVCTL_ID | head -c 8)x"
-ZONE=us-central1-a
+SERVICE_NAME="logging-go-gce-$(echo $ENVCTL_ID | head -c 8)"
+ZONE="us-west2-a"
 
 destroy() {
   set +e
@@ -29,37 +28,20 @@ destroy() {
   # delete container images
   export GCR_PATH=gcr.io/$PROJECT_ID/logging:$SERVICE_NAME
   gcloud container images delete $GCR_PATH -q --force-delete-tags 2> /dev/null
-  # delete cluster
-  gcloud container clusters delete --zone $ZONE $SERVICE_NAME -q
+  # delete service
+  gcloud compute instances delete $SERVICE_NAME -q
   set -e
 }
 
 verify() {
   set +e
-  gcloud pubsub subscriptions describe $SERVICE_NAME-subscriber 2> /dev/null
-  if [[ $? != 0 ]]; then
-     echo "FALSE"
-     exit 1
-  fi
-  gcloud container clusters describe --zone $ZONE $SERVICE_NAME > /dev/null 2> /dev/null
+  gcloud compute instances describe $SERVICE_NAME > /dev/null 2> /dev/null
   if [[ $? == 0 ]]; then
      echo "TRUE"
      exit 0
    else
      echo "FALSE"
      exit 1
-  fi
-  set -e
-}
-
-attach_or_create_gke_cluster(){
-  set +e
-  gcloud container clusters get-credentials $SERVICE_NAME
-  if [[ $? -ne 0 ]]; then
-    echo "cluster not found. creating..."
-    gcloud container clusters create $SERVICE_NAME \
-      --zone $ZONE \
-      --scopes=gke-default,pubsub
   fi
   set -e
 }
@@ -82,44 +64,12 @@ build_go_container(){
 }
 
 deploy() {
-#   local SCRIPT="${1:-router.py}"
-#   TODO: double check this doesn't print impt otkens/pws
-  set -x
-  attach_or_create_gke_cluster
   build_go_container
-  cat <<EOF > $TMP_DIR/gke.yaml
-    apiVersion: apps/v1
-    kind: Deployment
-    metadata:
-      name: $SERVICE_NAME
-    spec:
-      selector:
-        matchLabels:
-          app: $SERVICE_NAME
-      template:
-        metadata:
-          labels:
-            app: $SERVICE_NAME
-        spec:
-          containers:
-          - name: $SERVICE_NAME
-            image:  $GCR_PATH
-            env:
-            - name: PUBSUB_TOPIC
-              value: $SERVICE_NAME
-            - name: ENABLE_SUBSCRIBER
-              value: "true"
-EOF
-  # clean cluster
-  set +e
-  kubectl delete deployments --all 2>/dev/null
-  kubectl delete -f $TMP_DIR 2>/dev/null
-  set -e
-  # deploy test container
-  kubectl apply -f $TMP_DIR
-  sleep 60
-  # wait for pod to spin up
-  kubectl wait --for=condition=ready pod -l app=$SERVICE_NAME
+  gcloud config set compute/zone $ZONE
+  gcloud compute instances create-with-container \
+    $SERVICE_NAME \
+    --container-image $GCR_PATH \
+    --container-env PUBSUB_TOPIC="$SERVICE_NAME",ENABLE_SUBSCRIBER="true"
   # wait for the pub/sub subscriber to start
   NUM_SUBSCRIBERS=0
   TRIES=0
@@ -131,6 +81,8 @@ EOF
 }
 
 filter-string() {
-  echo "resource.type=\"k8s_container\" AND resource.labels.cluster_name=\"$SERVICE_NAME\""
+  #INSTANCE_ID=$(gcloud compute instances list --filter="name~^$SERVICE_NAME$" --format="value(ID)")
+  #echo "resource.type=\"gce_instance\" AND resource.labels.instance_id=\"$INSTANCE_ID\""
+  echo "resource.type=\"global\""
 }
 
