@@ -157,7 +157,7 @@ class Common:
         self.assertIsNotNone(found_log, "expected unicode log not found")
 
     def test_monitored_resource(self):
-        if self.language not in ["nodejs", "go"]:
+        if self.language not in ["nodejs", "go", "python"]:
             # TODO: other languages to also support this test
             return True
         log_text = f"{inspect.currentframe().f_code.co_name}"

@@ -78,10 +78,6 @@ class CommonPython:
             self.assertEqual(found_severity.lower(), severity.lower())
 
     def test_source_location_pylogging(self):
-        if self.environment == "kubernetes" or "appengine" in self.environment:
-            # disable these tests on environments with custom handlers
-            # todo: enable in v3.0.0
-            return
         log_text = f"{inspect.currentframe().f_code.co_name}"
         log_list = self.trigger_and_retrieve(log_text, "pylogging")
         found_source = log_list[-1].source_location
@@ -95,10 +91,6 @@ class CommonPython:
         self.assertTrue(int(found_source["line"]) > 0)
 
     def test_flask_http_request_pylogging(self):
-        if self.environment == "kubernetes" or "appengine" in self.environment:
-            # disable these tests on environments with custom handlers
-            # todo: enable in v3.0.0
-            return
         log_text = f"{inspect.currentframe().f_code.co_name}"
 
         expected_agent = "test-agent"
@@ -138,10 +130,6 @@ class CommonPython:
             self.assertEqual(expected_span, found_span)
 
     def test_pylogging_extras(self):
-        if self.environment == "kubernetes" or "appengine" in self.environment:
-            # disable these tests on environments with custom handlers
-            # todo: enable in v3.0.0
-            return
         log_text = f"{inspect.currentframe().f_code.co_name}"
         kwargs = {
             "trace": "123",
@@ -192,10 +180,6 @@ class CommonPython:
         self.assertEqual(found_log.labels["custom"], kwargs["label_custom"])
 
     def test_pylogging_extras_sparse(self):
-        if self.environment == "kubernetes" or "appengine" in self.environment:
-            # disable these tests on environments with custom handlers
-            # todo: enable in v3.0.0
-            return
         log_text = f"{inspect.currentframe().f_code.co_name}"
         kwargs = {
             "requestMethod": "POST",
