@@ -1,3 +1,4 @@
+#!/bin/bash
 # Copyright 2021 Google LLC
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
@@ -12,25 +13,8 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-# Use the official lightweight Node.js 12 image.
-# https://hub.docker.com/_/node
-FROM node:12-slim
+set -e # exit on any failure
+set -o pipefail # any step in pipe caused failure
+set -u # undefined variables cause exit
 
-# Create and change to the app directory.
-WORKDIR /usr/src/app
-
-# Copy test script and local dependencies to the container image.
-COPY package*.json ./
-COPY app.js ./
-COPY tests.js ./
-# Assumption: local file is already built
-COPY nodejs-logging ./nodejs-logging
-
-# Install test app's dependencies.
-RUN npm install --production
-
-# Environment variable denoting whether to run an app server
-ENV RUNSERVER=1
-
-# Run the web service on container startup.
-CMD [ "npm", "start" ]
+SERVICE_NAME="log-node-gae-$(echo $ENVCTL_ID | head -c 8)"

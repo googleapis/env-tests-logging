@@ -12,14 +12,17 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+console.log("REQUIRE TESTS!!!");
 var tests = require('./tests.js');
 
+console.log("Excecuting the app!!!");
 /**
  * Only triggers for GCP services that require a running app server.
  * For instance, Cloud Functions does not execute this block.
  * RUNSERVER env var is set in the Dockerfile.
  */
 if (process.env.RUNSERVER) {
+  console.log("RUNSERVER!!!");
   const express = require('express');
   const bodyParser = require('body-parser');
   const app = express();
@@ -29,26 +32,30 @@ if (process.env.RUNSERVER) {
   /**
    * Cloud Run to be triggered by Pub/Sub.
    */
-  app.post('/', (req, res) => {
-    if (!req.body) {
-      const msg = 'no Pub/Sub message received';
-      console.error(`error: ${msg}`);
-      res.status(400).send(`Bad Request: ${msg}`);
-      return;
-    }
-    if (!req.body.message) {
-      const msg = 'invalid Pub/Sub message format';
-      console.error(`error: ${msg}`);
-      res.status(400).send(`Bad Request: ${msg}`);
-      return;
-    }
+  if (process.env.K_CONFIGURATION) {
+    console.log("IS CLOUD RUN!!!");
+    app.post('/', (req, res) => {
+      if (!req.body) {
+        const msg = 'no Pub/Sub message received';
+        console.error(`error: ${msg}`);
+        res.status(400).send(`Bad Request: ${msg}`);
+        return;
+      }
+      if (!req.body.message) {
+        const msg = 'invalid Pub/Sub message format';
+        console.error(`error: ${msg}`);
+        res.status(400).send(`Bad Request: ${msg}`);
+        return;
+      }
 
-    const message = req.body.message;
-    triggerTest(message);
+      const message = req.body.message;
+      triggerTest(message);
 
-    res.status(204).send();
-  });
+      res.status(204).send();
+    });
+  };
 
+  console.log("STARTING APP SERVER!!!");
   // Start app server
   const PORT = process.env.PORT || 8080;
   app.listen(PORT, () =>
@@ -56,6 +63,7 @@ if (process.env.RUNSERVER) {
   );
 }
 
+console.log("EXPORT PUBSUB FUNCTION!!!");
 /**
  * Background Cloud Function to be triggered by Pub/Sub.
  * This function is exported by index.js, and executed when
