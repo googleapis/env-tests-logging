@@ -12,7 +12,6 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-console.log("REQUIRE TESTS!!!");
 var tests = require('./tests.js');
 
 /** ****************** GAE, GKE, GCE ******************
@@ -31,10 +30,7 @@ async function enableSubscriber() {
     const pubSubClient = new PubSub();
     // Creates a new subscription
     pubSubClient.topic(topicName).createSubscription(subscriptionName);
-    console.log(`Subscription ${subscriptionName} created.`);
-
     listenForMessages(pubSubClient, subscriptionName).catch(console.error);
-    console.log(`Listening for messages.`);
   }
 }
 enableSubscriber().catch(console.error);
@@ -45,7 +41,6 @@ enableSubscriber().catch(console.error);
  * RUNSERVER env var is set in the Dockerfile.
  */
 if (process.env.RUNSERVER) {
-  console.log("RUNSERVER!!!");
   const express = require('express');
   const bodyParser = require('body-parser');
   const app = express();
@@ -77,7 +72,6 @@ if (process.env.RUNSERVER) {
     });
   };
 
-  console.log("STARTING APP SERVER!!!");
   // Start app server
   const PORT = process.env.PORT || 8080;
   app.listen(PORT, () =>
@@ -85,7 +79,6 @@ if (process.env.RUNSERVER) {
   );
 }
 
-console.log("EXPORT PUBSUB FUNCTION!!!");
 /**
  * Background Cloud Function to be triggered by Pub/Sub.
  * This function is exported by index.js, and executed when
@@ -110,9 +103,6 @@ async function listenForMessages(pubSubClient, subscriptionName) {
 
   // Handles incoming messages and triggers tests.
   const messageHandler = message => {
-    console.log(`Received message ${message.id}:`);
-    console.log(`\tData: ${message.data}`);
-    console.log(`\tAttributes: ${message.attributes}`);
     triggerTest(message);
     // "Ack" (acknowledge receipt of) the message
     message.ack();
