@@ -73,8 +73,6 @@ build_node_container(){
   # copy over local copy of library
   pushd $SUPERREPO_ROOT
       tar -cvf $_deployable_dir/lib.tar --exclude node_modules --exclude env-tests-logging --exclude test --exclude system-test --exclude .nox --exclude samples --exclude docs .
-#    tar -cvf $_deployable_dir/lib.tar --exclude env-tests-logging --exclude test --exclude system-test \
-#    --exclude .nox --exclude samples --exclude docs --exclude .git .
   popd
   mkdir -p $_deployable_dir/$LIBRARY_NAME
   tar -xvf $_deployable_dir/lib.tar --directory $_deployable_dir/$LIBRARY_NAME
