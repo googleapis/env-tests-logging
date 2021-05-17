@@ -66,7 +66,6 @@ build_node_container() {
 }
 
 deploy() {
-  set -x
   build_node_container
   gcloud config set compute/zone $ZONE
   gcloud compute instances create-with-container \

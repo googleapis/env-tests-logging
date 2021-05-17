@@ -87,7 +87,6 @@ build_node_container() {
 }
 
 deploy() {
-  set -x
   build_node_container
   gcloud config set run/platform managed
   gcloud config set run/region us-west1

@@ -82,7 +82,6 @@ build_node_container(){
 }
 
 deploy() {
-  set -x
   attach_or_create_gke_cluster
   build_node_container
   cat <<EOF > $TMP_DIR/gke.yaml
