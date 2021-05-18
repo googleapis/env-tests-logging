@@ -41,5 +41,5 @@ class TestAppEngineStandard(Common, CommonPython, unittest.TestCase):
 
         self.assertIsNotNone(found_log.labels)
         self.assertIsNotNone(found_log.trace)
-        self.assertEqual(found_log.labels['appengine.googleapis.com/trace_id'], expected_trace)
-        self.assertEqual(found_log.trace, expected_trace)
+        self.assertEqual(found_log.labels['appengine.googleapis.com/trace_id'], found_log.trace)
+        self.assertIn(expected_trace, found_log.trace)
