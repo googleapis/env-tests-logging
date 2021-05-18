@@ -26,4 +26,4 @@ class TestKubernetesEngine(Common, unittest.TestCase):
     language = "go"
 
     monitored_resource_name = "k8s_container"
-    monitored_resource_labels = ["project_id", "location", "cluster_name", "pod_name", "namespace_name"]
+    monitored_resource_labels = ["project_id", "location", "cluster_name", "pod_name", "namespace_name", "container_name"]
