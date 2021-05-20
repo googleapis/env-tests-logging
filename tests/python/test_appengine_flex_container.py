@@ -36,10 +36,14 @@ class TestAppEngineFlexContainer(Common, CommonPython, unittest.TestCase):
         """
         expected_trace = "123"
         log_text = f"{inspect.currentframe().f_code.co_name}"
-        log_list = self.trigger_and_retrieve(log_text, "pylogging_flask", trace=expected_trace)
+        log_list = self.trigger_and_retrieve(
+            log_text, "pylogging_flask", trace=expected_trace
+        )
         found_log = log_list[-1]
 
         self.assertIsNotNone(found_log.labels)
         self.assertIsNotNone(found_log.trace)
-        self.assertEqual(found_log.labels['appengine.googleapis.com/trace_id'], found_log.trace)
+        self.assertEqual(
+            found_log.labels["appengine.googleapis.com/trace_id"], found_log.trace
+        )
         self.assertIn(expected_trace, found_log.trace)

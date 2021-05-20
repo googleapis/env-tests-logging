@@ -59,6 +59,7 @@ def pylogging_json(log_text=None, severity="WARNING", **kwargs):
     else:
         logging.critical(message)
 
+
 def pylogging(log_text="pylogging", severity="WARNING", **kwargs):
     # allowed severity: debug, info, warning, error, critical
 

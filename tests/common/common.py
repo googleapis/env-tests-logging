@@ -169,8 +169,9 @@ class Common:
 
         self.assertEqual(found_resource.type, self.monitored_resource_name)
         for label in self.monitored_resource_labels:
-            self.assertTrue(found_resource.labels[label],
-                f'resource.labels[{label}] is not set')
+            self.assertTrue(
+                found_resource.labels[label], f"resource.labels[{label}] is not set"
+            )
 
     def test_severity(self):
         if self.language != "python":
