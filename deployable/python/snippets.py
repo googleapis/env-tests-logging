@@ -47,22 +47,23 @@ def jsonlog(log_name=None, log_text=None, severity="DEFAULT", **kwargs):
 
     # build json message
     message = {}
-    for k,v in kwargs.items():
+    for k, v in kwargs.items():
         message[k] = int(v) if v.isnumeric() else v
     if log_text:
-        message['message'] = log_text
+        message["message"] = log_text
 
     logger.log_struct(message, severity=severity)
+
 
 def pylogging_json(log_text=None, severity="WARNING", **kwargs):
     # allowed severity: debug, info, warning, error, critical
 
     # build json message
     message = {}
-    for k,v in kwargs.items():
+    for k, v in kwargs.items():
         message[k] = int(v) if v.isnumeric() else v
     if log_text:
-        message['message'] = log_text
+        message["message"] = log_text
 
     severity = severity.upper()
     if severity == "DEBUG":

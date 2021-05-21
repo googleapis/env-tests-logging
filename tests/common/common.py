@@ -161,15 +161,15 @@ class Common:
             # TODO: other languages to also support this test
             return True
         log_text = f"{inspect.currentframe().f_code.co_name} 嗨 世界 😀"
-        log_dict = {"message_short": log_text, "extra_field": "test", "num_field":2}
-        log_list = self.trigger_and_retrieve(log_text, "jsonlog", **log_dict)
+        log_dict = {"message_short": log_text, "extra_field": "test", "num_field": 2}
+        log_list = self.trigger_and_retrieve(log_dict, "jsonlog", **log_dict)
 
         found_log = log_list[-1]
 
         self.assertIsNotNone(found_log, "expected log text not found")
         self.assertTrue(isinstance(found_log.payload, dict), "expected jsonPayload")
         # trim auto-inserted field containing uuid
-        found_log.payload.pop('message')
+        found_log.payload.pop("message")
         self.assertEqual(found_log.payload, log_dict)
 
     def test_monitored_resource(self):

@@ -45,7 +45,7 @@ class CommonPython:
 
     def test_pylogging_json_log(self):
         log_text = f"{inspect.currentframe().f_code.co_name} 嗨 世界 😀"
-        log_dict = {"message_short": log_text, "extra_field": "test", "num_field":2}
+        log_dict = {"message_short": log_text, "extra_field": "test", "num_field": 2}
         log_list = self.trigger_and_retrieve(log_text, "pylogging_json", **log_dict)
 
         found_log = log_list[-1]
@@ -53,7 +53,7 @@ class CommonPython:
         self.assertIsNotNone(found_log, "expected log text not found")
         self.assertTrue(isinstance(found_log.payload, dict), "expected jsonPayload")
         # trim auto-inserted field containing uuid
-        found_log.payload.pop('message')
+        found_log.payload.pop("message")
         self.assertEqual(found_log.payload, log_dict)
 
     def test_monitored_resource_pylogging(self):
