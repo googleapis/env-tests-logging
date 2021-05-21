@@ -26,31 +26,35 @@ class CommonPython:
         log_text = f"{inspect.currentframe().f_code.co_name}"
         log_list = self.trigger_and_retrieve(log_text, "pylogging")
 
-        found_log = None
-        for log in log_list:
-            message = (
-                log.payload.get("message", None)
-                if isinstance(log.payload, dict)
-                else str(log.payload)
-            )
-            if message and log_text in message:
-                found_log = log
+        found_log = log_list[-1]
+
         self.assertIsNotNone(found_log, "expected log text not found")
+        self.assertTrue(isinstance(found_log.payload, str), "expected textPayload")
+        self.assertTrue(found_log.payload.startswith(log_text))
+        self.assertEqual(len(log_list), 1, "expected 1 log")
 
     def test_pylogging_receive_unicode_log(self):
         log_text = f"{inspect.currentframe().f_code.co_name} 嗨 世界 😀"
         log_list = self.trigger_and_retrieve(log_text, "pylogging")
 
-        found_log = None
-        for log in log_list:
-            message = (
-                log.payload.get("message", None)
-                if isinstance(log.payload, dict)
-                else str(log.payload)
-            )
-            if message and log_text in message:
-                found_log = log
-        self.assertIsNotNone(found_log, "expected unicode log not found")
+        found_log = log_list[-1]
+
+        self.assertIsNotNone(found_log, "expected log text not found")
+        self.assertTrue(isinstance(found_log.payload, str), "expected textPayload")
+        self.assertTrue(found_log.payload.startswith(log_text))
+
+    def test_pylogging_json_log(self):
+        log_text = f"{inspect.currentframe().f_code.co_name} 嗨 世界 😀"
+        log_dict = {"message_short": log_text, "extra_field": "test"}
+        log_list = self.trigger_and_retrieve(log_text, "pylogging_json", **log_dict)
+
+        found_log = log_list[-1]
+
+        self.assertIsNotNone(found_log, "expected log text not found")
+        self.assertTrue(isinstance(found_log.payload, dict), "expected jsonPayload")
+        # trim auto-inserted field containing uuid
+        found_log.payload.pop('message')
+        self.assertEqual(found_log.payload, log_dict)
 
     def test_monitored_resource_pylogging(self):
         log_text = f"{inspect.currentframe().f_code.co_name}"

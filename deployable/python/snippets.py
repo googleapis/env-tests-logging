@@ -46,6 +46,8 @@ def pylogging_json(log_text=None, severity="WARNING", **kwargs):
     message = {}
     for k in kwargs.keys():
         message[k] = kwargs[k]
+    if log_text:
+        message['message'] = log_text
 
     severity = severity.upper()
     if severity == "DEBUG":
