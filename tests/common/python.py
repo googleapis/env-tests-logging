@@ -45,7 +45,7 @@ class CommonPython:
 
     def test_pylogging_json_log(self):
         log_text = f"{inspect.currentframe().f_code.co_name} 嗨 世界 😀"
-        log_dict = {"message_short": log_text, "extra_field": "test"}
+        log_dict = {"message_short": log_text, "extra_field": "test", "num_field":2}
         log_list = self.trigger_and_retrieve(log_text, "pylogging_json", **log_dict)
 
         found_log = log_list[-1]

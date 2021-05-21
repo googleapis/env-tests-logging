@@ -44,8 +44,8 @@ def pylogging_json(log_text=None, severity="WARNING", **kwargs):
 
     # build json message
     message = {}
-    for k in kwargs.keys():
-        message[k] = kwargs[k]
+    for k,v in kwargs.items():
+        message[k] = int(v) if v.isnumeric() else v
     if log_text:
         message['message'] = log_text
 
