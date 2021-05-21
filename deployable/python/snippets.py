@@ -39,6 +39,21 @@ def simplelog(log_name=None, log_text="simple_log", severity="DEFAULT", **kwargs
     logger.log_text(log_text, severity=severity)
 
 
+def jsonlog(log_name=None, log_text=None, severity="DEFAULT", **kwargs):
+    # allowed severity: default, debug, info, notice, warning, error, critical, alert, emergency
+    severity = severity.upper()
+    client = google.cloud.logging.Client()
+    logger = client.logger(log_name)
+
+    # build json message
+    message = {}
+    for k,v in kwargs.items():
+        message[k] = int(v) if v.isnumeric() else v
+    if log_text:
+        message['message'] = log_text
+
+    logger.log_struct(message, severity=severity)
+
 def pylogging_json(log_text=None, severity="WARNING", **kwargs):
     # allowed severity: debug, info, warning, error, critical
 

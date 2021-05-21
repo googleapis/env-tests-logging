@@ -156,6 +156,22 @@ class Common:
                 found_log = log
         self.assertIsNotNone(found_log, "expected unicode log not found")
 
+    def test_json_log(self):
+        if self.language not in ["python"]:
+            # TODO: other languages to also support this test
+            return True
+        log_text = f"{inspect.currentframe().f_code.co_name} 嗨 世界 😀"
+        log_dict = {"message_short": log_text, "extra_field": "test", "num_field":2}
+        log_list = self.trigger_and_retrieve(log_text, "jsonlog", **log_dict)
+
+        found_log = log_list[-1]
+
+        self.assertIsNotNone(found_log, "expected log text not found")
+        self.assertTrue(isinstance(found_log.payload, dict), "expected jsonPayload")
+        # trim auto-inserted field containing uuid
+        found_log.payload.pop('message')
+        self.assertEqual(found_log.payload, log_dict)
+
     def test_monitored_resource(self):
         if self.language not in ["nodejs", "go"]:
             # TODO: other languages to also support this test
