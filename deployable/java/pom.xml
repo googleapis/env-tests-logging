@@ -18,7 +18,34 @@
     <checkstyle.config.location>./checkstyle.xml</checkstyle.config.location>
     <maven.compiler.source>1.8</maven.compiler.source>
     <maven.compiler.target>1.8</maven.compiler.target>
+    <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
   </properties>
+
+  <dependencyManagement>
+    <dependencies>
+      <dependency>
+        <groupId>com.google.cloud</groupId>
+        <artifactId>libraries-bom</artifactId>
+        <version>20.4.0</version>
+        <type>pom</type>
+        <scope>import</scope>
+      </dependency>
+    </dependencies>
+  </dependencyManagement>
+
+  <dependencies>
+    <dependency>
+      <groupId>com.google.cloud</groupId>
+      <artifactId>google-cloud-pubsub</artifactId>
+      <version>1.112.5</version>
+    </dependency>
+
+    <dependency>
+      <groupId>com.google.protobuf</groupId>
+      <artifactId>protobuf-java-util</artifactId>
+      <version>3.17.1</version>
+    </dependency>
+  </dependencies>
 
   <build>
     <plugins>
@@ -40,7 +67,7 @@
               <transformers>
                 <transformer
                     implementation="org.apache.maven.plugins.shade.resource.ManifestResourceTransformer">
-                  <mainClass>main.java.hello.HelloWorld</mainClass>
+                  <mainClass>main.java.envtests.Router</mainClass>
                 </transformer>
               </transformers>
             </configuration>
