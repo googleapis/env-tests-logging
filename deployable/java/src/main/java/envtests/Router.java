@@ -18,6 +18,7 @@ package main.java.envtests;
 
 import com.google.auth.oauth2.GoogleCredentials;
 import com.google.auth.oauth2.ServiceAccountCredentials;
+import com.google.cloud.logging.Severity;
 import com.google.cloud.pubsub.v1.AckReplyConsumer;
 import com.google.cloud.pubsub.v1.MessageReceiver;
 import com.google.cloud.pubsub.v1.Subscriber;
@@ -33,10 +34,13 @@ import java.util.concurrent.TimeoutException;
 
 public class Router {
 
+  private static Snippets snippets = new Snippets();
+
   private static void subscribe(String projectId, String subscriptionId) {
     ProjectSubscriptionName subscriptionName = ProjectSubscriptionName.of(projectId, subscriptionId);
 
     MessageReceiver receiver = (PubsubMessage message, AckReplyConsumer consumer) -> {
+      triggerTest(message, snippets);
       System.out.println("Id: " + message.getMessageId());
       System.out.println("Data: " + message.getData().toStringUtf8());
       consumer.ack();
@@ -53,6 +57,23 @@ public class Router {
     }
   }
 
+  private static void triggerTest(PubsubMessage message, Snippets snippets) {
+    // TODO while we could make it generic and use reflection, it's not safe so for now - ugly ifs
+    if (message == null)
+      return;
+
+    String testName = message.getData().toStringUtf8();
+    if (testName == null || testName == "")
+      return;
+
+    String logName = message.getAttributesOrDefault("log_name", null);
+    String logText = message.getAttributesOrDefault("log_text", null);
+    Severity severity = Severity.valueOf(message.getAttributesOrDefault("severity", null));
+    if (testName == "simpleLog") {
+      snippets.SimpleLog(logName, logText, severity);
+    }
+  }
+
   public static void main(String[] args) throws IOException {
     System.out.println("hello world!");
     String projectId = "MY_PROJECT_ID";
@@ -65,7 +86,7 @@ public class Router {
       // TODO - zeltser - figure out where to read it from
       GoogleCredentials credentials = GoogleCredentials.getApplicationDefault();
       if (credentials instanceof ServiceAccountCredentials) {
-        projectId = ((ServiceAccountCredentials)credentials).getProjectId();
+        projectId = ((ServiceAccountCredentials) credentials).getProjectId();
       }
 
       topicId = System.getenv("PUBSUB_TOPIC");
@@ -73,10 +94,10 @@ public class Router {
         topicId = "logging-test";
       }
 
+      Snippets snippets = new Snippets();
+
       subscriptionId = topicId + "-subscriber";
-      //String topicName2 = String.format("projects/%s/topics/%s", projectId, topicId);
       TopicName topicName = TopicName.of(projectId, topicId);
-      //String subscriptionName2 = String.format("projects/%s/subscriptions/%s", projectId, subscriptionId);
       ProjectSubscriptionName subscriptionName = ProjectSubscriptionName.of(projectId, subscriptionId);
       SubscriptionAdminClient subscriptionClient = SubscriptionAdminClient.create();
       subscriptionClient.createSubscription(
@@ -87,33 +108,4 @@ public class Router {
       subscribe(projectId, subscriptionId);
     }
   }
-/*
-  public static void subscribe(String projectId, String topic) throws InterruptedException {
-    Publisher publisher = null;
-    try {
-      publisher = Publisher.newBuilder(topic).build();
-      ByteString data = ByteString.copyFromUtf8("my-message");
-      PubsubMessage pubsubMessage = PubsubMessage.newBuilder().setData(data).build();
-      ApiFuture<String> messageIdFuture = publisher.publish(pubsubMessage);
-      ApiFutures.addCallback(messageIdFuture, new ApiFutureCallback<String>() {
-        public void onSuccess(String messageId) {
-          System.out.println("published with message id: " + messageId);
-        }
-
-        public void onFailure(Throwable t) {
-          System.out.println("failed to publish: " + t);
-        }
-      }, MoreExecutors.directExecutor());
-      //...
-    } catch (IOException e) {
-      e.printStackTrace();
-    } finally {
-      if (publisher != null) {
-        publisher.shutdown();
-        publisher.awaitTermination(1, TimeUnit.MINUTES);
-      }
-    }
-  }
-
- */
 }

@@ -19,7 +19,7 @@ set -u # undefined variables cause exit
 
 SERVICE_NAME="log-node-run-$(echo $ENVCTL_ID | head -c 8)"
 SA_NAME=$SERVICE_NAME-invoker
-LIBRARY_NAME="nodejs-logging"
+LIBRARY_NAME="java-logging"
 
 add_service_accounts() {
   set +e
