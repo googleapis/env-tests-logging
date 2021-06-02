@@ -2,7 +2,7 @@
 <module type="JAVA_MODULE" version="4">
   <component name="FacetManager">
     <facet type="Python" name="Python">
-      <configuration sdkName="" />
+      <configuration sdkName="Python 3.7 (env-tests-logging)" />
     </facet>
   </component>
   <component name="Go" enabled="true" />
@@ -15,5 +15,6 @@
     <orderEntry type="sourceFolder" forTests="false" />
     <orderEntry type="library" name="com.google.cloud:google-cloud-pubsub:1.112.3" level="project" />
     <orderEntry type="library" name="com.google.cloud:google-cloud-logging:1.102.0" level="project" />
+    <orderEntry type="library" name="Python 3.7 (env-tests-logging) interpreter library" level="application" />
   </component>
 </module>

@@ -17,7 +17,7 @@ set -e # exit on any failure
 set -o pipefail # any step in pipe caused failure
 set -u # undefined variables cause exit
 
-SERVICE_NAME="log-node-run-$(echo $ENVCTL_ID | head -c 8)"
+SERVICE_NAME="log-java-run-$(echo $ENVCTL_ID | head -c 8)"
 SA_NAME=$SERVICE_NAME-invoker
 LIBRARY_NAME="java-logging"
 
