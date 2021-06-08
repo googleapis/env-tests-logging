@@ -100,6 +100,11 @@ def pylogging(log_text="pylogging", severity="WARNING", **kwargs):
     else:
         logging.critical(log_text, extra=kwargs)
 
+def pylogging_multiline(log_text="pylogging", second_line="line 2", **kwargs):
+    logging.error(f"{log_text}\n{second_line}")
+
+def pylogging_complex_chars(**kwargs):
+    logging.error('}"{!@[')
 
 def pylogging_flask(
     log_text="pylogging_flask",
