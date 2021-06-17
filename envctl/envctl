@@ -4,7 +4,9 @@ set -o pipefail # any step in pipe caused failure
 set -u # undefined variables cause exit
 
 # set an ID to use for future runs
-ENVCTL_ID="${ENVCTL_ID:-$(hostname)}"
+# remove dots from the hostname if present
+host=$(echo $(hostname) | sed 's/\.//g')
+ENVCTL_ID="${ENVCTL_ID:-$(host)}"
 
 # find the associated project
 PROJECT_ID="${PROJECT_ID:-$(gcloud config get-value project)}"
@@ -28,7 +30,9 @@ TMP_DIR=$REPO_ROOT/tmp-$UUID
 mkdir $TMP_DIR
 function finish {
     # Your cleanup code here
-    rm -rf $TMP_DIR
+    # remove - zeltser
+    echo 'skipped removing dir'
+    #rm -rf $TMP_DIR
 }
 trap finish EXIT
 

@@ -14,13 +14,9 @@
  * limitations under the License.
  */
 
-package main.java.envtests;
+package envtests;
 
-import com.google.cloud.logging.LogEntry;
-import com.google.cloud.logging.Logging;
-import com.google.cloud.logging.LoggingOptions;
-import com.google.cloud.logging.Payload.StringPayload;
-import com.google.cloud.logging.Severity;
+import com.google.cloud.logging.*;
 
 import java.util.Collections;
 
@@ -28,7 +24,7 @@ public class Snippets {
     public void SimpleLog(String logName, String logText, Severity severity) {
 
         try (Logging logging = LoggingOptions.getDefaultInstance().getService()) {
-            LogEntry simpleLog = LogEntry.newBuilder(StringPayload.of(logText))
+            LogEntry simpleLog = LogEntry.newBuilder(Payload.StringPayload.of(logText))
                     .setLogName(logName)
                     .setSeverity(severity)
                     .build();

@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package main.java.envtests;
+package envtests;
 
 import com.google.auth.oauth2.GoogleCredentials;
 import com.google.auth.oauth2.ServiceAccountCredentials;
@@ -27,8 +27,11 @@ import com.google.pubsub.v1.ProjectSubscriptionName;
 import com.google.pubsub.v1.PubsubMessage;
 import com.google.pubsub.v1.PushConfig;
 import com.google.pubsub.v1.TopicName;
+import com.sun.net.httpserver.HttpServer;
 
 import java.io.IOException;
+import java.io.OutputStream;
+import java.net.InetSocketAddress;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
 
@@ -74,15 +77,27 @@ public class Router {
     }
   }
 
+  // Event driven function - TODO - zeltser - rewrite
+  /*
+  public void PubSubGcf(Message message, Context context) {
+    if (message != null && message.getData() != null) {
+      String messageStr = new String(Base64.getDecoder().decode(message.getData()
+              .getBytes(StandardCharsets.UTF_8)), StandardCharsets.UTF_8);
+    }
+  }*/
+
   public static void main(String[] args) throws IOException {
-    System.out.println("hello world!");
+
     String projectId = "MY_PROJECT_ID";
     String topicId;
     String subscriptionId;
 
     // ****************** GAE, GKE, GCE ******************
     // Enable app subscriber for all environments except GCR
-    if (System.getenv("ENABLE_SUBSCRIBER") == "true") {
+    Boolean enableSubscriber = Boolean.parseBoolean(System.getenv().getOrDefault("ENABLE_SUBSCRIBER", "false"));
+    System.out.format("ENV: ENABLE_SUBSCRIBER=true\n");
+    if (enableSubscriber) {
+
       // TODO - zeltser - figure out where to read it from
       GoogleCredentials credentials = GoogleCredentials.getApplicationDefault();
       if (credentials instanceof ServiceAccountCredentials) {
@@ -93,8 +108,6 @@ public class Router {
       if (topicId != null && topicId != "") {
         topicId = "logging-test";
       }
-
-      Snippets snippets = new Snippets();
 
       subscriptionId = topicId + "-subscriber";
       TopicName topicName = TopicName.of(projectId, topicId);
@@ -107,5 +120,31 @@ public class Router {
               20);
       subscribe(projectId, subscriptionId);
     }
+
+    // GCR, GAE Standard
+    Boolean runServer = Boolean.parseBoolean(System.getenv().getOrDefault("RUNSERVER", "0"));
+    System.out.format("ENV: RUNSERVER=%b\n", runServer);
+    if (runServer) {
+      Integer port = 8080;
+      if (System.getenv("PORT") != null && System.getenv("PORT") != "") {
+        port = Integer.parseInt(System.getenv("PORT"));
+      }
+
+      // Start a web server for Cloud Run
+      try {
+        HttpServer server = HttpServer.create(new InetSocketAddress(port), 0);
+        server.createContext("/", (var t) -> {
+          byte[] response = "Hello World!".getBytes();
+          t.sendResponseHeaders(200, response.length);
+          try (OutputStream os = t.getResponseBody()) {
+            os.write(response);
+          }
+        });
+        server.start();
+      } catch (Throwable tr) {
+        tr.printStackTrace();
+      }
+    }
   }
 }
+

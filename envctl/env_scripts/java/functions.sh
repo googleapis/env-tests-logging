@@ -62,7 +62,7 @@ deploy() {
   cp -R $REPO_ROOT/deployable/java/src $TMP_DIR/
 
   # deploy function
-  local RUNTIME="java"
+  local RUNTIME="java11"
   pushd $TMP_DIR
     echo "in TMP_DIR"
     ls

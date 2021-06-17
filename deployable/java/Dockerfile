@@ -36,5 +36,7 @@ COPY --from=build-env /app/target/ /app/
 # Environment variable denoting whether to run an app server
 ENV RUNSERVER=1
 
+ENV PORT=8080
+
 # Run the web service on container startup.
 CMD [ "java", "-jar", "/app/java-logging-env-tests-1.0.0.jar" ]

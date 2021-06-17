@@ -18,7 +18,7 @@ set -o pipefail # any step in pipe caused failure
 set -u # undefined variables cause exit
 
 SERVICE_NAME="log-java-gae-$(echo $ENVCTL_ID | head -c 8)"
-LIBRARY_NAME="java-logging"
+LIBRARY_NAME="google-java-logging"
 
 destroy() {
   set +e
@@ -49,26 +49,35 @@ deploy() {
   gcloud pubsub topics create $SERVICE_NAME 2>/dev/null
   set -ex
 
-  # copy over local version of the library
+  # copy over local version of the logging library
   pushd $SUPERREPO_ROOT
-    tar -cvf $TMP_DIR/lib.tar --exclude target --exclude env-tests-logging --exclude test --exclude system-test --exclude .nox --exclude samples --exclude docs .
+    tar -cvf $TMP_DIR/lib.tar --exclude target --exclude env-tests-logging --exclude test --exclude .git --exclude samples --exclude .github --exclude docs .
   popd
-  mkdir -p $TMP_DIR/$LIBRARY_NAME
-  tar -xvf $TMP_DIR/lib.tar --directory $TMP_DIR/$LIBRARY_NAME
+  mkdir -p $TMP_DIR/repo/$LIBRARY_NAME
+  tar -xvf $TMP_DIR/lib.tar --directory $TMP_DIR/repo/$LIBRARY_NAME
 
   # Copy over test code and Java dependencies
-  cp -R $REPO_ROOT/deployable/java/src $TMP_DIR
+  cp -R $REPO_ROOT/deployable/java/ $TMP_DIR
 
   # manual_scaling allows 1 instance to continuously run regardless of the load level.
   cat <<EOF > $TMP_DIR/app.yaml
     runtime: java11
-    service: $SERVICE_NAME
+    entrypoint: java java/envtests/Router.java
     manual_scaling:
       instances: 1
     env_variables:
       ENABLE_SUBSCRIBER: "true"
       PUBSUB_TOPIC: $SERVICE_NAME
+      RUNSERVER: 1
 EOF
+
+  pushd $TMP_DIR
+    # create appengine package with the test code
+    mvn -Dmaven.test.skip=true package
+    mkdir -p $TMP_DIR/app
+    cp $TMP_DIR/target/ /$TMP_DIR/app
+  popd
+
   # deploy
   pushd $TMP_DIR
     gcloud app deploy -q
