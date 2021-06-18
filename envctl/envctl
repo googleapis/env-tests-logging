@@ -5,8 +5,8 @@ set -u # undefined variables cause exit
 
 # set an ID to use for future runs
 # remove dots from the hostname if present
-host=$(echo $(hostname) | sed 's/\.//g')
-ENVCTL_ID="${ENVCTL_ID:-$(host)}"
+HOST=$(echo $(hostname) | sed 's/[^a-zA-Z0-9]//g')
+ENVCTL_ID="${ENVCTL_ID:-$HOST}"
 
 # find the associated project
 PROJECT_ID="${PROJECT_ID:-$(gcloud config get-value project)}"
