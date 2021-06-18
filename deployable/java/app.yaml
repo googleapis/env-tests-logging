@@ -1,7 +1,0 @@
-runtime: java11
-manual_scaling:
-      instances: 1
-env_variables:
-      ENABLE_SUBSCRIBER: "true"
-      PUBSUB_TOPIC: log-java-gae-zeltser
-      RUN_SERVER: 1
