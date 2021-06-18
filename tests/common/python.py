@@ -60,13 +60,15 @@ class CommonPython:
     def test_pylogging_multiline(self):
         first_line = f"{inspect.currentframe().f_code.co_name}"
         second_line = "hello world"
-        log_list = self.trigger_and_retrieve(first_line, "pylogging_multiline", second_line=second_line)
+        log_list = self.trigger_and_retrieve(
+            first_line, "pylogging_multiline", second_line=second_line
+        )
         found_log = log_list[-1]
         found_message = (
-                found_log.payload.get("message", None)
-                if isinstance(found_log.payload, dict)
-                else str(found_log.payload)
-            )
+            found_log.payload.get("message", None)
+            if isinstance(found_log.payload, dict)
+            else str(found_log.payload)
+        )
 
         self.assertTrue(re.match(f"{first_line} .*\n{second_line}", found_message))
 
@@ -76,23 +78,25 @@ class CommonPython:
         log_list = self.trigger_and_retrieve(log_text, "pylogging_with_arg")
         found_log = log_list[-1]
         found_message = (
-                found_log.payload.get("message", None)
-                if isinstance(found_log.payload, dict)
-                else str(found_log.payload)
-            )
+            found_log.payload.get("message", None)
+            if isinstance(found_log.payload, dict)
+            else str(found_log.payload)
+        )
 
         self.assertTrue(re.match(f"Arg: {log_text} .*", found_message))
 
     def test_pylogging_with_formatter(self):
         log_text = f"{inspect.currentframe().f_code.co_name}"
-        format_str = '%(levelname)s :: %(message)s'
-        log_list = self.trigger_and_retrieve(log_text, "pylogging_with_formatter", format_str=format_str)
+        format_str = "%(levelname)s :: %(message)s"
+        log_list = self.trigger_and_retrieve(
+            log_text, "pylogging_with_formatter", format_str=format_str
+        )
         found_log = log_list[-1]
         found_message = (
-                found_log.payload.get("message", None)
-                if isinstance(found_log.payload, dict)
-                else str(found_log.payload)
-            )
+            found_log.payload.get("message", None)
+            if isinstance(found_log.payload, dict)
+            else str(found_log.payload)
+        )
 
         self.assertTrue(re.match(f"ERROR :: {log_text} .*", found_message))
 
