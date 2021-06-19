@@ -115,8 +115,14 @@ public class DeployableApplication {
             @Override
             public void handle(HttpExchange exchange) throws IOException {
                 System.out.println("received message");
+                // send response
+                OutputStream outputStream = exchange.getResponseBody();
+                exchange.sendResponseHeaders(200, 0);
+                outputStream.close();
             }
-         });
+          });
+          System.out.println("listening for http requests on port " + System.getenv("PORT"));
+          server.start();
         }
     }
 }
