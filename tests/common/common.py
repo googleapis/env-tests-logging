@@ -177,7 +177,7 @@ class Common:
             # TODO: other languages to also support this test
             return True
         log_text = f"{inspect.currentframe().f_code.co_name}"
-        log_list = self.trigger_and_retrieve(log_text, "stdoutlog")
+        log_list = self.trigger_and_retrieve(log_text, "requestlog")
         found_request = log_list[-1].http_request
         # TODO(nicolezhu): remove hasattr check later.
         if hasattr(self, 'request_props'):
