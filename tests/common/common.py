@@ -172,6 +172,30 @@ class Common:
             self.assertTrue(found_resource.labels[label],
                 f'resource.labels[{label}] is not set')
 
+    def test_request_log(self):
+        if self.language not in ["nodejs"]:
+            # TODO: other languages to also support this test
+            return True
+        log_text = f"{inspect.currentframe().f_code.co_name}"
+        log_list = self.trigger_and_retrieve(log_text, "stdoutlog")
+        found_request = log_list[-1].httpRequest
+
+        for prop in self.request_props:
+            self.assertTrue(found_request[prop],
+            f'httpRequest[{label}] is not set')
+
+    def test_stdout_log(self):
+        if self.language not in ["nodejs"]:
+            # TODO: other languages to also support this test
+            return True
+        log_text = f"{inspect.currentframe().f_code.co_name}"
+        log_list = self.trigger_and_retrieve(log_text, "stdoutlog")
+        found = log_list[-1]
+
+        # Not all agents lift all fields. Only check if prop is defined in test.
+        if self.stdout_severity:
+            self.assertEqual(found.severity, self.stdout_severity)
+
     def test_severity(self):
         if self.language != "python":
             # to do: enable test for other languages

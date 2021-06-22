@@ -32,3 +32,33 @@ class TestCloudFunctions(Common, unittest.TestCase):
         "function_name",
         "project_id",
     ]
+
+    # Just look for the substring so we're `project_id` agnostic
+    request_trace = "/traces/1"
+    request_span_id = "1"
+    request_trace_sampled = "true"
+    request_props = [
+        "requestMethod",
+        "requestUrl",
+        "protocol",
+    ]
+
+    stdout_jsonpayload_props = [
+        "message",
+        # Not lifted by Functions agent:
+        "resource",
+        "timestamp",
+        "logName",
+    ]
+    stdout_severity = "WARNING"
+    stdout_request_props = request_props
+    stdout_labels = [
+        "foo",
+        # Nicely inserted by the agent
+        "execution_id",
+    ]
+    # Randomly dropped by Functions agent (bad):
+    # stdout_insert_id = '42'
+    # stdout_trace = /traces/0679686673a'
+    # stdout_span_id = '000000000000004a'
+    # stdout_trace_sampled = 'true'
