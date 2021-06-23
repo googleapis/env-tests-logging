@@ -183,7 +183,7 @@ class Common:
         if hasattr(self, 'request_props'):
             for prop in self.request_props:
                 self.assertTrue(found_request[prop],
-                f'httpRequest[{prop}] is not set')
+                f'http_request[{prop}] is not set')
 
     def test_stdout_log(self):
         if self.language not in ["nodejs"]:
