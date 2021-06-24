@@ -37,3 +37,28 @@ class TestCloudRun(Common, unittest.TestCase):
         "location",
         "configuration_name",
     ]
+
+    request_props = [
+        "requestMethod",
+        "requestUrl",
+        "protocol",
+    ]
+
+    stdout_payload_props = [
+        "message",
+        "resource",
+        "timestamp",
+        "logName",
+    ]
+    stdout_severity = "WARNING"
+    stdout_request_props = request_props
+    stdout_labels = [
+        "foo",
+    ]
+    stdout_insert_id = "42"
+    # substring to test for
+    stdout_log_name = "/logs/stdout"
+    # substring to test for
+    stdout_trace = "/traces/0679686673a"
+    stdout_span_id = '000000000000004a'
+    stdout_trace_sampled = 'true'
