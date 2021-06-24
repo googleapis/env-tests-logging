@@ -18,9 +18,10 @@ import unittest
 import google.cloud.logging
 
 from ..common.common import Common
+from ..common.stdout import CommonStdout
 
 
-class TestAppEngineStandard(Common, unittest.TestCase):
+class TestAppEngineStandard(Common, CommonStdout, unittest.TestCase):
 
     environment = "appengine_standard"
     language = "nodejs"
@@ -45,10 +46,14 @@ class TestAppEngineStandard(Common, unittest.TestCase):
     stdout_labels = [
         "foo",
     ]
-    stdout_insert_id = "42"
-    # substring to test for
-    stdout_log_name = "/logs/stdout"
     # substring to test for
     stdout_trace = "/traces/0679686673a"
-    stdout_span_id = '000000000000004a'
-    stdout_trace_sampled = 'true'
+    stdout_span_id = "000000000000004a"
+
+    # Not lifted properly
+    # stdout_trace_sampled = "true"
+    # stdout_insert_id
+    # stdout_resource_type
+    # stdout_timestamp
+    # stdout_log_name: its /logs/stdout
+

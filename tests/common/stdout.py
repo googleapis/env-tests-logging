@@ -32,7 +32,6 @@ class CommonStdout:
         log_text = f"{inspect.currentframe().f_code.co_name}"
         log_list = self.trigger_and_retrieve(log_text, "stdoutlog")
         # Note: 2 logs are spawned, use the one containing http_request prop.
-        print(log_list)
         found = log_list[-1]
         if found.http_request is None:
             found = log_list[-2]

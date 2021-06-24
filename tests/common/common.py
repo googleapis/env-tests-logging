@@ -179,7 +179,6 @@ class Common:
         log_text = f"{inspect.currentframe().f_code.co_name}"
         log_list = self.trigger_and_retrieve(log_text, "requestlog")
         # Note: 2 logs are spawned, only one containing http_request prop.
-        print(log_list)
         log_entry = log_list[-1]
         if log_entry.http_request is None:
           log_entry = log_list[-2]
