@@ -26,6 +26,9 @@ class CommonStdout:
         if self.language not in ["nodejs"]:
             # TODO: other languages to also support this test
             return True
+        if self.environment in ["compute"]:
+           # No logging agent support in GCE
+           return True
         log_text = f"{inspect.currentframe().f_code.co_name}"
         log_list = self.trigger_and_retrieve(log_text, "stdoutlog")
         found = log_list[-1]

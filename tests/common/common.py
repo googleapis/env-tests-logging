@@ -79,7 +79,6 @@ class Common:
         self._trigger(snippet, log_text=log_text, **kwargs)
         sleep(2)
         filter_str = self._add_time_condition_to_filter(log_text)
-        print(filter_str)
         # give the command time to be received
         tries = 0
         while tries < max_tries:
@@ -180,6 +179,8 @@ class Common:
         log_text = f"{inspect.currentframe().f_code.co_name}"
         log_list = self.trigger_and_retrieve(log_text, "requestlog")
         found_request = log_list[-1].http_request
+        print('test_request_log request log looks like:')
+        print(log_list[-1])
         if hasattr(self, 'request_props'):
             for prop in self.request_props:
                 self.assertTrue(found_request[prop],
