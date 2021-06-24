@@ -160,17 +160,16 @@ class Common:
         if self.language not in ["python"]:
             # TODO: other languages to also support this test
             return True
-        log_text = f"{inspect.currentframe().f_code.co_name} 嗨 世界 😀"
-        log_dict = {"message_short": log_text, "extra_field": "test", "num_field": 2}
-        log_list = self.trigger_and_retrieve(log_text, "jsonlog", **log_dict)
+        log_text = f"{inspect.currentframe().f_code.co_name} {uuid.uuid1()}"
+        log_dict = {"unicode_field": "嗨 世界 😀", "num_field": 2}
+        log_list = self.trigger_and_retrieve(log_text, "jsonlog", append_uuid=False, **log_dict)
 
         found_log = log_list[-1]
 
         self.assertIsNotNone(found_log, "expected log text not found")
         self.assertTrue(isinstance(found_log.payload, dict), "expected jsonPayload")
-        # trim auto-inserted field containing uuid
-        found_log.payload.pop("message")
-        self.assertEqual(found_log.payload, log_dict)
+        expected_dict = {"message": log_text, **log_dict}
+        self.assertEqual(found_log.payload, expected_dict)
 
     def test_monitored_resource(self):
         if self.language not in ["nodejs", "go"]:

@@ -14,7 +14,7 @@
 
 import logging
 import os
-
+import json
 
 try:
     import google.cloud.logging
@@ -55,7 +55,7 @@ def jsonlog(log_name=None, log_text=None, severity="DEFAULT", **kwargs):
     logger.log_struct(message, severity=severity)
 
 
-def pylogging_json(log_text=None, severity="WARNING", **kwargs):
+def pylogging_json(log_text=None, severity="WARNING", string_encode=False, **kwargs):
     # allowed severity: debug, info, warning, error, critical
 
     # build json message
@@ -64,6 +64,9 @@ def pylogging_json(log_text=None, severity="WARNING", **kwargs):
         message[k] = int(v) if v.isnumeric() else v
     if log_text:
         message["message"] = log_text
+    if string_encode:
+        str_msg = json.dumps(message, ensure_ascii=False)
+        message = json.dumps({**message, "raw_str":str_msg}, ensure_ascii=False)
 
     severity = severity.upper()
     if severity == "DEBUG":
@@ -76,7 +79,6 @@ def pylogging_json(log_text=None, severity="WARNING", **kwargs):
         logging.error(message)
     else:
         logging.critical(message)
-
 
 def pylogging(log_text="pylogging", severity="WARNING", **kwargs):
     # allowed severity: debug, info, warning, error, critical

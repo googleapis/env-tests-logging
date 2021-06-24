@@ -16,6 +16,8 @@ import logging
 import unittest
 import inspect
 import re
+import uuid
+import json
 
 import google.cloud.logging
 
@@ -45,17 +47,30 @@ class CommonPython:
         self.assertTrue(found_log.payload.startswith(log_text))
 
     def test_pylogging_json_log(self):
-        log_text = f"{inspect.currentframe().f_code.co_name} 嗨 世界 😀"
-        log_dict = {"message_short": log_text, "extra_field": "test", "num_field": 2}
-        log_list = self.trigger_and_retrieve(log_text, "pylogging_json", **log_dict)
+        log_text = f"{inspect.currentframe().f_code.co_name} {uuid.uuid1()}"
+        log_dict = {"unicode_field": "嗨 世界 😀", "num_field": 2}
+        log_list = self.trigger_and_retrieve(log_text, "pylogging_json", append_uuid=False, **log_dict)
 
         found_log = log_list[-1]
 
         self.assertIsNotNone(found_log, "expected log text not found")
         self.assertTrue(isinstance(found_log.payload, dict), "expected jsonPayload")
-        # trim auto-inserted field containing uuid
-        found_log.payload.pop("message")
-        self.assertEqual(found_log.payload, log_dict)
+        expected_dict = {"message": log_text, **log_dict}
+        self.assertEqual(found_log.payload, expected_dict)
+
+    def test_pylogging_encoded_json_log(self):
+        log_text = f"{inspect.currentframe().f_code.co_name} {uuid.uuid1()}"
+        log_dict = {"unicode_field": "嗨 世界 😀", "num_field": 2}
+        log_list = self.trigger_and_retrieve(log_text, "pylogging_json", string_encode="True", append_uuid=False, **log_dict)
+
+        found_log = log_list[-1]
+
+        self.assertIsNotNone(found_log, "expected log text not found")
+        self.assertTrue(isinstance(found_log.payload, dict), "expected jsonPayload")
+        raw_str = found_log.payload.pop('raw_str')
+        expected_dict = {"message": log_text, **log_dict}
+        self.assertEqual(json.loads(raw_str), expected_dict)
+        self.assertEqual(found_log.payload, expected_dict)
 
     def test_pylogging_multiline(self):
         first_line = f"{inspect.currentframe().f_code.co_name}"
