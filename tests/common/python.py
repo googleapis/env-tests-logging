@@ -49,7 +49,9 @@ class CommonPython:
     def test_pylogging_json_log(self):
         log_text = f"{inspect.currentframe().f_code.co_name} {uuid.uuid1()}"
         log_dict = {"unicode_field": "嗨 世界 😀", "num_field": 2}
-        log_list = self.trigger_and_retrieve(log_text, "pylogging_json", append_uuid=False, **log_dict)
+        log_list = self.trigger_and_retrieve(
+            log_text, "pylogging_json", append_uuid=False, **log_dict
+        )
 
         found_log = log_list[-1]
 
@@ -61,13 +63,19 @@ class CommonPython:
     def test_pylogging_encoded_json_log(self):
         log_text = f"{inspect.currentframe().f_code.co_name} {uuid.uuid1()}"
         log_dict = {"unicode_field": "嗨 世界 😀", "num_field": 2}
-        log_list = self.trigger_and_retrieve(log_text, "pylogging_json", string_encode="True", append_uuid=False, **log_dict)
+        log_list = self.trigger_and_retrieve(
+            log_text,
+            "pylogging_json",
+            string_encode="True",
+            append_uuid=False,
+            **log_dict,
+        )
 
         found_log = log_list[-1]
 
         self.assertIsNotNone(found_log, "expected log text not found")
         self.assertTrue(isinstance(found_log.payload, dict), "expected jsonPayload")
-        raw_str = found_log.payload.pop('raw_str')
+        raw_str = found_log.payload.pop("raw_str")
         expected_dict = {"message": log_text, **log_dict}
         self.assertEqual(json.loads(raw_str), expected_dict)
         self.assertEqual(found_log.payload, expected_dict)

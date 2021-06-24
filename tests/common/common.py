@@ -162,7 +162,9 @@ class Common:
             return True
         log_text = f"{inspect.currentframe().f_code.co_name} {uuid.uuid1()}"
         log_dict = {"unicode_field": "嗨 世界 😀", "num_field": 2}
-        log_list = self.trigger_and_retrieve(log_text, "jsonlog", append_uuid=False, **log_dict)
+        log_list = self.trigger_and_retrieve(
+            log_text, "jsonlog", append_uuid=False, **log_dict
+        )
 
         found_log = log_list[-1]
 

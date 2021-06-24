@@ -66,7 +66,7 @@ def pylogging_json(log_text=None, severity="WARNING", string_encode=False, **kwa
         message["message"] = log_text
     if string_encode:
         str_msg = json.dumps(message, ensure_ascii=False)
-        message = json.dumps({**message, "raw_str":str_msg}, ensure_ascii=False)
+        message = json.dumps({**message, "raw_str": str_msg}, ensure_ascii=False)
 
     severity = severity.upper()
     if severity == "DEBUG":
@@ -79,6 +79,7 @@ def pylogging_json(log_text=None, severity="WARNING", string_encode=False, **kwa
         logging.error(message)
     else:
         logging.critical(message)
+
 
 def pylogging(log_text="pylogging", severity="WARNING", **kwargs):
     # allowed severity: debug, info, warning, error, critical
