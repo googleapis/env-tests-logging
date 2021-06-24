@@ -41,7 +41,7 @@ var simplelog = function(logname = "my-log", logtext = "hello world" ) {
 var requestlog = function(logname = 'my-log', logtext = 'hello world', request) {
   if (!request) request = defaultRequest;
   const log = logging.log(logname);
-  const entry = log.entry({httpRequest: request});
+  const entry = log.entry({httpRequest: request}, logtext);
   log.write(entry).then(r => console.log(r));
 }
 

@@ -79,6 +79,7 @@ class Common:
         self._trigger(snippet, log_text=log_text, **kwargs)
         sleep(2)
         filter_str = self._add_time_condition_to_filter(log_text)
+        print(filter_str)
         # give the command time to be received
         tries = 0
         while tries < max_tries:
@@ -179,49 +180,10 @@ class Common:
         log_text = f"{inspect.currentframe().f_code.co_name}"
         log_list = self.trigger_and_retrieve(log_text, "requestlog")
         found_request = log_list[-1].http_request
-        # TODO(nicolezhu): remove hasattr check later.
         if hasattr(self, 'request_props'):
             for prop in self.request_props:
                 self.assertTrue(found_request[prop],
-                f'http_request[{prop}] is not set')
-
-    def test_stdout_log(self):
-        if self.language not in ["nodejs"]:
-            # TODO: other languages to also support this test
-            return True
-        log_text = f"{inspect.currentframe().f_code.co_name}"
-        log_list = self.trigger_and_retrieve(log_text, "stdoutlog")
-        found = log_list[-1]
-
-        # Agents lift fields inconsistently among envs, so check if is expected.
-        if hasattr(self, 'stdout_log_name'):
-           self.assertEqual(found.log_name, self.stdout_log_name)
-        if hasattr(self, 'stdout_severity'):
-            self.assertEqual(found.severity, self.stdout_severity)
-        if hasattr(self, 'stdout_insert_id'):
-            self.assertEqual(found.insert_id, self.stdout_insert_id)
-        if hasattr(self, 'stdout_timestamp'):
-            self.assertEqual(found.timestamp, self.stdout_timestamp)
-        if hasattr(self, 'stdout_trace'):
-            self.assertEqual(found.trace, self.stdout_trace)
-        if hasattr(self, 'stdout_span_id'):
-            self.assertEqual(found.span_id, self.span_id)
-        if hasattr(self, 'stdout_trace_sampled'):
-            self.assertEqual(found.severity, self.stdout_trace_sampled)
-        if hasattr(self, 'stdout_labels'):
-            for prop in self.stdout_labels:
-                self.assertTrue(found.labels[prop],
-                f'httpRequest[{prop}] is not set')
-        if hasattr(self, 'stdout_resource_type'):
-            self.assertEqual(found.resource.type, self.stdout_resource_type)
-        if hasattr(self, 'stdout_resource_labels'):
-            for prop in self.stdout_resource_labels:
-                self.assertTrue(found.resource.labels[prop],
-                f'httpRequest[{prop}] is not set')
-        if hasattr(self, 'stdout_payload_props'):
-            for prop in self.stdout_payload_props:
-                self.assertTrue(found.payload[prop],
-                f'httpRequest[{prop}] is not set')
+                f'{prop} is not set')
 
     def test_severity(self):
         if self.language != "python":

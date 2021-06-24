@@ -19,9 +19,10 @@ import inspect
 import google.cloud.logging
 
 from ..common.common import Common
+from ..common.stdout import CommonStdout
 
 
-class TestCloudFunctions(Common, unittest.TestCase):
+class TestCloudFunctions(Common, CommonStdout, unittest.TestCase):
 
     environment = "functions"
     language = "nodejs"
