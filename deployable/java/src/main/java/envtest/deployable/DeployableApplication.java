@@ -118,6 +118,7 @@ public class DeployableApplication {
         Boolean enableSubscriber = Boolean.parseBoolean(System.getenv().getOrDefault("ENABLE_SUBSCRIBER", "false"));
         System.out.format("ENV: ENABLE_SUBSCRIBER=true\n");
         if (enableSubscriber) {
+          // start a pub/sub server and listen for messages
           startPubsubSubscription();
         }
 
@@ -125,25 +126,8 @@ public class DeployableApplication {
         Boolean runServer = Boolean.parseBoolean(System.getenv().getOrDefault("RUNSERVER", "0"));
         System.out.format("ENV: RUNSERVER=%b\n", runServer);
         if (runServer) {
-          Integer port = 8080;
-          if (System.getenv("PORT") != null && System.getenv("PORT") != "") {
-            port = Integer.parseInt(System.getenv("PORT"));
-          }
-
-          // Start a web server for Cloud Run
-          HttpServer server = HttpServer.create(new InetSocketAddress(port), 0);
-          server.createContext("/", new HttpHandler() {
-            @Override
-            public void handle(HttpExchange exchange) throws IOException {
-                System.out.println("received message");
-                // send response
-                OutputStream outputStream = exchange.getResponseBody();
-                exchange.sendResponseHeaders(200, 0);
-                outputStream.close();
-            }
-          });
-          System.out.println("listening for http requests on port " + System.getenv("PORT"));
-          server.start();
+          // hand off execution to DeployableHttpController
+          SpringApplication.run(DeployableApplication.class, args);
         }
     }
 }
