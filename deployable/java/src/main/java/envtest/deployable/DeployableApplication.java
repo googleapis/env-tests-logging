@@ -51,16 +51,33 @@ public class DeployableApplication {
 
     private static final org.slf4j.Logger logger = LoggerFactory.getLogger(DeployableApplication.class);
 
-    private static void subscribe(String projectId, String subscriptionId) {
+    private static void startPubsubSubscription() throws IOException {
+        // create variables
+        // TODO - figure out where to read project from
+        GoogleCredentials credentials = GoogleCredentials.getApplicationDefault();
+        String projectId = "";
+        if (credentials instanceof ServiceAccountCredentials) {
+          projectId = ((ServiceAccountCredentials) credentials).getProjectId();
+        }
+        String topicId = System.getenv().getOrDefault("PUBSUB_TOPIC", "logging-test");
+        String subscriptionId = topicId + "-subscriber";
+        TopicName topicName = TopicName.of(projectId, topicId);
         ProjectSubscriptionName subscriptionName = ProjectSubscriptionName.of(projectId, subscriptionId);
-
+        // create subscription
+        SubscriptionAdminClient subscriptionClient = SubscriptionAdminClient.create();
+        subscriptionClient.createSubscription(
+               subscriptionName,
+               topicName,
+               PushConfig.newBuilder().build(),
+               20);
+        // define callback
         MessageReceiver receiver = (PubsubMessage message, AckReplyConsumer consumer) -> {
         // triggerTest(message, snippets);
           System.out.println("Id: " + message.getMessageId());
           System.out.println("Data: " + message.getData().toStringUtf8());
           consumer.ack();
         };
-
+        // start subscriber
         Subscriber subscriber = null;
         try {
           subscriber = Subscriber.newBuilder(subscriptionName, receiver).build();
@@ -86,23 +103,7 @@ public class DeployableApplication {
         Boolean enableSubscriber = Boolean.parseBoolean(System.getenv().getOrDefault("ENABLE_SUBSCRIBER", "false"));
         System.out.format("ENV: ENABLE_SUBSCRIBER=true\n");
         if (enableSubscriber) {
-          // TODO - zeltser - figure out where to read it from
-          GoogleCredentials credentials = GoogleCredentials.getApplicationDefault();
-          if (credentials instanceof ServiceAccountCredentials) {
-            projectId = ((ServiceAccountCredentials) credentials).getProjectId();
-          }
-
-          topicId = System.getenv().getOrDefault("PUBSUB_TOPIC", "logging-test");
-          subscriptionId = topicId + "-subscriber";
-          TopicName topicName = TopicName.of(projectId, topicId);
-          ProjectSubscriptionName subscriptionName = ProjectSubscriptionName.of(projectId, subscriptionId);
-          SubscriptionAdminClient subscriptionClient = SubscriptionAdminClient.create();
-          subscriptionClient.createSubscription(
-                  subscriptionName,
-                  topicName,
-                  PushConfig.newBuilder().build(),
-                  20);
-          subscribe(projectId, subscriptionId);
+          startPubsubSubscription();
         }
 
         // GCR, GAE Standard
