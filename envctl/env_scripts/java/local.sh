@@ -17,13 +17,17 @@ set -e # exit on any failure
 set -o pipefail # any step in pipe caused failure
 set -u # undefined variables cause exit
 
-SERVICE_NAME="log-java-run-$(echo $ENVCTL_ID | head -c 8)"
+SERVICE_NAME="log-java-local-$(echo $ENVCTL_ID | head -c 8)"
 SA_NAME=$SERVICE_NAME-invoker
 LIBRARY_NAME="java-logging"
 
 destroy() {
   set +e
-  docker stop $SERVICE_NAME
+  # delete pubsub resources
+  gcloud pubsub topics delete $SERVICE_NAME -q  2> /dev/null
+  gcloud pubsub subscriptions delete $SERVICE_NAME-subscriber -q  2> /dev/null
+  # stop container
+  docker stop $SERVICE_NAME 2> /dev/null
   set -e
 }
 
@@ -59,7 +63,10 @@ build_java_container() {
 deploy() {
   build_java_container
   FLAGS=${@:-"-d"}
-  docker run --rm --name $SERVICE_NAME -e RUNSERVER=true -e ENABLE_SUBSCRIBER=false -e PORT=8080 -p 8080:8080 $FLAGS $GCR_PATH
+  docker run --rm --name $SERVICE_NAME -e RUNSERVER=false -e ENABLE_SUBSCRIBER=true -e PUBSUB_TOPIC=$SERVICE_NAME \
+    # todo: link in local service account for authentication
+    #-v ~/service-account.json:/service-account.json -e GOOGLE_APPLICATION_CREDENTIALS=/service-account.json \
+    $FLAGS $GCR_PATH
 }
 
 filter-string() {
