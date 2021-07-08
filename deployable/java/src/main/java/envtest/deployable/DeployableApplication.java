@@ -20,6 +20,9 @@ import java.util.concurrent.TimeoutException;
 import java.io.IOException;
 import java.lang.Thread;
 import java.lang.InterruptedException;
+import java.lang.NoSuchMethodException;
+import java.lang.IllegalAccessException;
+import java.lang.reflect.InvocationTargetException;
 
 import com.google.auth.oauth2.GoogleCredentials;
 import com.google.auth.oauth2.ServiceAccountCredentials;
@@ -36,11 +39,12 @@ import com.sun.net.httpserver.HttpServer;
 import com.sun.net.httpserver.HttpHandler;
 import com.sun.net.httpserver.HttpExchange;
 
-import java.io.IOException;
 import java.io.OutputStream;
 import java.net.InetSocketAddress;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
+import java.util.Map;
+import java.lang.reflect.Method;
 
 /**
  * This class serves as an entry point for the Spring Boot app
@@ -72,10 +76,10 @@ public class DeployableApplication {
                20);
         // define callback
         MessageReceiver receiver = (PubsubMessage message, AckReplyConsumer consumer) -> {
-        // triggerTest(message, snippets);
-          System.out.println("Id: " + message.getMessageId());
-          System.out.println("Data: " + message.getData().toStringUtf8());
           consumer.ack();
+          String fnName = message.getData().toStringUtf8();
+          Map<String, String> args = message.getAttributes();
+          triggerSnippet(fnName, args);
         };
         // start subscriber
         Subscriber subscriber = null;
@@ -87,6 +91,17 @@ public class DeployableApplication {
         } finally {
           subscriber.stopAsync().awaitTerminated();
         }
+    }
+
+    public static void triggerSnippet(String fnName, Map<String,String> args) {
+      try {
+          Snippets obj = new Snippets();
+          Class c = obj.getClass();
+          Method found = c.getDeclaredMethod(fnName, new Class[] {Map.class});
+          found.invoke(obj, args);
+      } catch (NoSuchMethodException | IllegalAccessException | InvocationTargetException e) {
+          System.out.println(e.toString());
+      }
     }
 
     public static void main(String[] args) throws IOException {
