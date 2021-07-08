@@ -62,11 +62,12 @@ build_java_container() {
 
 deploy() {
   build_java_container
+  # for interactive mode, run `envctl java local deploy -it`
   FLAGS=${@:-"-d"}
   docker run --rm --name $SERVICE_NAME -e RUNSERVER=false -e ENABLE_SUBSCRIBER=true -e PUBSUB_TOPIC=$SERVICE_NAME \
-    # todo: link in local service account for authentication
-    #-v ~/service-account.json:/service-account.json -e GOOGLE_APPLICATION_CREDENTIALS=/service-account.json \
     $FLAGS $GCR_PATH
+    # for authentication, link in local service account
+    #-v ~/service-account.json:/service-account.json -e GOOGLE_APPLICATION_CREDENTIALS=/service-account.json \
 }
 
 filter-string() {
