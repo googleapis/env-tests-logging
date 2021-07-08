@@ -46,6 +46,12 @@ import java.util.concurrent.TimeoutException;
 import java.util.Map;
 import java.lang.reflect.Method;
 
+import java.io.BufferedReader;
+import java.net.URL;
+import java.io.InputStreamReader;
+import java.net.MalformedURLException;
+import java.net.HttpURLConnection;
+
 /**
  * This class serves as an entry point for the Spring Boot app
  * Here, we check to ensure all required environment variables are set
@@ -55,14 +61,32 @@ public class DeployableApplication {
 
     private static final org.slf4j.Logger logger = LoggerFactory.getLogger(DeployableApplication.class);
 
-    private static void startPubsubSubscription() throws IOException {
-        // create variables
-        // TODO - figure out where to read project from
-        GoogleCredentials credentials = GoogleCredentials.getApplicationDefault();
-        String projectId = "";
-        if (credentials instanceof ServiceAccountCredentials) {
-          projectId = ((ServiceAccountCredentials) credentials).getProjectId();
+    private static String getProjectId() throws RuntimeException {
+        try {
+            // try reading from service account
+            GoogleCredentials credentials = GoogleCredentials.getApplicationDefault();
+            if (credentials instanceof ServiceAccountCredentials) {
+              String id = ((ServiceAccountCredentials) credentials).getProjectId();
+              if (id != null){
+                  return id;
+              }
+            }
+            // try grabbing from metadata server
+            URL url = new URL("http://metadata.google.internal/computeMetadata/v1/project/project-id");
+            HttpURLConnection conn = (HttpURLConnection) url.openConnection();
+            conn.setRequestProperty("Metadata-Flavor", "Google");
+            BufferedReader reader = new BufferedReader(new InputStreamReader(conn.getInputStream(), "UTF-8"));
+            String line = reader.readLine();
+            return line;
+        } catch (IOException e){
+            System.out.println(e);
         }
+        throw new RuntimeException("could not find project ID");
+    }
+
+    private static void startPubsubSubscription() throws IOException, RuntimeException {
+        // create variables
+        String projectId = getProjectId();
         String topicId = System.getenv().getOrDefault("PUBSUB_TOPIC", "logging-test");
         String subscriptionId = topicId + "-subscriber";
         TopicName topicName = TopicName.of(projectId, topicId);
@@ -104,7 +128,7 @@ public class DeployableApplication {
       }
     }
 
-    public static void main(String[] args) throws IOException {
+    public static void main(String[] args) throws IOException, RuntimeException {
         String projectId = "";
         String topicId;
         String subscriptionId;

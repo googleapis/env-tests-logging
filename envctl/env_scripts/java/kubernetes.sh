@@ -83,7 +83,7 @@ build_java_container(){
 
 deploy() {
   attach_or_create_gke_cluster
-  build_node_container
+  build_java_container
   cat <<EOF > $TMP_DIR/gke.yaml
     apiVersion: apps/v1
     kind: Deployment
@@ -101,11 +101,14 @@ deploy() {
           containers:
           - name: $SERVICE_NAME
             image:  $GCR_PATH
+            imagePullPolicy: Always
             env:
             - name: PUBSUB_TOPIC
               value: $SERVICE_NAME
             - name: ENABLE_SUBSCRIBER
               value: "true"
+            - name: RUNSERVER
+              value: "false"
 EOF
   # clean cluster
   set +e
