@@ -1,7 +1,8 @@
 package envtest.deployable;
 
-import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import ch.qos.logback.classic.Level;
+import ch.qos.logback.classic.Logger;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 
@@ -48,7 +49,7 @@ import java.util.concurrent.TimeoutException;
 @SpringBootApplication
 public class DeployableApplication {
 
-    private static final Logger logger = LoggerFactory.getLogger(DeployableApplication.class);
+    private static final org.slf4j.Logger logger = LoggerFactory.getLogger(DeployableApplication.class);
 
     private static void subscribe(String projectId, String subscriptionId) {
         ProjectSubscriptionName subscriptionName = ProjectSubscriptionName.of(projectId, subscriptionId);
@@ -65,9 +66,9 @@ public class DeployableApplication {
           subscriber = Subscriber.newBuilder(subscriptionName, receiver).build();
           subscriber.startAsync().awaitRunning();
           System.out.printf("Listening for messages on %s:\n", subscriptionName.toString());
-          subscriber.awaitTerminated(30, TimeUnit.SECONDS);
-        } catch (TimeoutException timeoutException) {
-          subscriber.stopAsync();
+          subscriber.awaitTerminated();
+        } finally {
+          subscriber.stopAsync().awaitTerminated();
         }
     }
 
@@ -75,6 +76,10 @@ public class DeployableApplication {
         String projectId = "";
         String topicId;
         String subscriptionId;
+
+
+        Logger root = (Logger)LoggerFactory.getLogger(org.slf4j.Logger.ROOT_LOGGER_NAME);
+        root.setLevel(Level.INFO);
 
         // ****************** GAE, GKE, GCE ******************
         // Enable app subscriber for all environments except GCR
