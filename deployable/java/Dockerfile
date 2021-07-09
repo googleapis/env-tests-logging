@@ -8,7 +8,7 @@ RUN mvn -Dmaven.test.skip=true package
 # Compile the deployable code.
 FROM docker.io/maven AS build-env
 WORKDIR /app
-COPY pom.xml ./
+COPY pom.xml /app/pom.xml
 # copy over compiled library
 COPY --from=lib-env /app/target/*.jar /app/java-logging.jar
 # install java-logging
@@ -21,7 +21,7 @@ RUN mvn install:install-file \
     -DgeneratePom=true
 # download dependencies as specified in pom.xml
 RUN mvn verify --fail-never
-COPY . ./
+COPY src /app/src
 RUN mvn -Dmaven.test.skip=true package
 
 # Build runtime image.

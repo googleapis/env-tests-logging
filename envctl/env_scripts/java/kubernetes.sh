@@ -64,7 +64,7 @@ attach_or_create_gke_cluster(){
   set -e
 }
 
-build_java_container(){
+build_java_container() {
   export GCR_PATH=gcr.io/$PROJECT_ID/logging:$SERVICE_NAME
   # copy super-repo into deployable dir
   _env_tests_relative_path=${REPO_ROOT#"$SUPERREPO_ROOT/"}
@@ -72,10 +72,12 @@ build_java_container(){
 
   # copy over local copy of library
   pushd $SUPERREPO_ROOT
-      tar -cvf $_deployable_dir/lib.tar --exclude target --exclude env-tests-logging --exclude test --exclude system-test --exclude .nox --exclude samples --exclude docs .
+    tar -cvf $_deployable_dir/lib.tar --exclude target --exclude env-tests-logging --exclude test --exclude .git --exclude .github \
+      --exclude system-test --exclude .nox --exclude samples --exclude docs --exclude environment-tests --exclude .kokoro .
   popd
   mkdir -p $_deployable_dir/$LIBRARY_NAME
   tar -xvf $_deployable_dir/lib.tar --directory $_deployable_dir/$LIBRARY_NAME
+
   # build container
   docker build -t $GCR_PATH $_deployable_dir
   docker push $GCR_PATH

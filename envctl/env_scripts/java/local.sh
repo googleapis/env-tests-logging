@@ -51,7 +51,8 @@ build_java_container() {
 
   # copy over local copy of library
   pushd $SUPERREPO_ROOT
-    tar -cvf $_deployable_dir/lib.tar --exclude target --exclude env-tests-logging --exclude test --exclude system-test --exclude .nox --exclude samples --exclude docs .
+    tar -cvf $_deployable_dir/lib.tar --exclude target --exclude env-tests-logging --exclude test --exclude .git --exclude .github \
+      --exclude system-test --exclude .nox --exclude samples --exclude docs --exclude environment-tests --exclude .kokoro .
   popd
   mkdir -p $_deployable_dir/$LIBRARY_NAME
   tar -xvf $_deployable_dir/lib.tar --directory $_deployable_dir/$LIBRARY_NAME
