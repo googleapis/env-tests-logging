@@ -30,9 +30,7 @@ TMP_DIR=$REPO_ROOT/tmp-$UUID
 mkdir $TMP_DIR
 function finish {
     # Your cleanup code here
-    # remove - zeltser
-    echo 'skipped removing dir'
-    #rm -rf $TMP_DIR
+    rm -rf $TMP_DIR
 }
 trap finish EXIT
 
