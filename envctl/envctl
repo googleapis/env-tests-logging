@@ -36,6 +36,7 @@ trap finish EXIT
 
 # shared logic
 build_container() {
+  ARG=${1:-none}
   export GCR_PATH=gcr.io/$PROJECT_ID/logging:$SERVICE_NAME
   # copy super-repo into deployable dir
   _env_tests_relative_path=${REPO_ROOT#"$SUPERREPO_ROOT/"}
@@ -52,7 +53,7 @@ build_container() {
   tar -xvf $_deployable_dir/lib.tar --directory $_deployable_dir/$LIBRARY_NAME
   # build container
   docker build -t $GCR_PATH $_deployable_dir
-  if [[ "$1" != "nopush" ]]; then
+  if [[ "$ARG" != "nopush" ]]; then
     docker push $GCR_PATH
   fi
 }
