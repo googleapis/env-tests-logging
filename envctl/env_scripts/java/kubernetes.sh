@@ -19,7 +19,6 @@ set -u # undefined variables cause exit
 
 SERVICE_NAME="log-java-gke-$(echo $ENVCTL_ID | head -c 8)"
 ZONE=us-central1-a
-LIBRARY_NAME="java-logging"
 
 destroy() {
   set +e
@@ -64,28 +63,9 @@ attach_or_create_gke_cluster(){
   set -e
 }
 
-build_java_container() {
-  export GCR_PATH=gcr.io/$PROJECT_ID/logging:$SERVICE_NAME
-  # copy super-repo into deployable dir
-  _env_tests_relative_path=${REPO_ROOT#"$SUPERREPO_ROOT/"}
-  _deployable_dir=$REPO_ROOT/deployable/$LANGUAGE
-
-  # copy over local copy of library
-  pushd $SUPERREPO_ROOT
-    tar -cvf $_deployable_dir/lib.tar --exclude target --exclude env-tests-logging --exclude test --exclude .git --exclude .github \
-      --exclude system-test --exclude .nox --exclude samples --exclude docs --exclude environment-tests --exclude .kokoro .
-  popd
-  mkdir -p $_deployable_dir/$LIBRARY_NAME
-  tar -xvf $_deployable_dir/lib.tar --directory $_deployable_dir/$LIBRARY_NAME
-
-  # build container
-  docker build -t $GCR_PATH $_deployable_dir
-  docker push $GCR_PATH
-}
-
 deploy() {
   attach_or_create_gke_cluster
-  build_java_container
+  build_container
   cat <<EOF > $TMP_DIR/gke.yaml
     apiVersion: apps/v1
     kind: Deployment
