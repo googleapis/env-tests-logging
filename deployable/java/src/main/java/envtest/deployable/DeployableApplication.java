@@ -158,6 +158,7 @@ public class DeployableApplication {
         if (enableSubscriber) {
           // start a pub/sub server and listen for messages
           startPubsubSubscription();
+          return;
         }
 
         // GCR, GAE Standard
@@ -166,6 +167,7 @@ public class DeployableApplication {
         if (runServer) {
           // hand off execution to DeployableHttpController
           SpringApplication.run(DeployableApplication.class, args);
+          return;
         }
     }
 }
