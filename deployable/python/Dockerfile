@@ -30,7 +30,7 @@ COPY snippets.py /app/
 # install logging from local directory.
 WORKDIR /app
 ENV PATH="/app:${PATH}"
-COPY python-logging /app/python-logging
+COPY _library /app/python-logging
 RUN pip install -e /app/python-logging
 
 # Start script
