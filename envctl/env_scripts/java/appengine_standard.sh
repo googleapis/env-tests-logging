@@ -68,7 +68,7 @@ deploy() {
 EOF
   # deploy
   pushd $TMP_DIR
-    gcloud app deploy --appyaml $TMP_DIR/app.yaml $TMP_DIR/deployable-1.0.0.jar
+    gcloud app deploy --appyaml $TMP_DIR/app.yaml $TMP_DIR/deployable-1.0.0.jar -q
   popd
   # wait for the pub/sub subscriber to start
   NUM_SUBSCRIBERS=0
