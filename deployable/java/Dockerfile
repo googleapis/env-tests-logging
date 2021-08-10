@@ -15,7 +15,7 @@
 # compile local java-logging library
 FROM docker.io/maven AS lib-env
 WORKDIR /app
-COPY java-logging ./
+COPY _library ./java-logging
 RUN mvn verify --fail-never
 RUN mvn -Dmaven.test.skip=true package
 
