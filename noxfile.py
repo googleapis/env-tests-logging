@@ -160,3 +160,4 @@ def tests(session, language, platform):
         session.run("py.test", "-s", test_path, *session.posargs)
     else:
         session.skip(f"not yet implemented: {test_path}")
+        exit(1)
