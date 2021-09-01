@@ -17,9 +17,8 @@ set -e # exit on any failure
 set -o pipefail # any step in pipe caused failure
 set -u # undefined variables cause exit
 
-SERVICE_NAME="log-node-gke-$(echo $ENVCTL_ID | head -c 8)"
+SERVICE_NAME="log-java-gke-$(echo $ENVCTL_ID | head -c 8)"
 ZONE=us-central1-a
-LIBRARY_NAME="nodejs-logging"
 
 destroy() {
   set +e
@@ -85,11 +84,14 @@ deploy() {
           containers:
           - name: $SERVICE_NAME
             image:  $GCR_PATH
+            imagePullPolicy: Always
             env:
             - name: PUBSUB_TOPIC
               value: $SERVICE_NAME
             - name: ENABLE_SUBSCRIBER
               value: "true"
+            - name: RUNSERVER
+              value: "false"
 EOF
   # clean cluster
   set +e
