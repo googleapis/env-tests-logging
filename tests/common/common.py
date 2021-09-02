@@ -173,25 +173,7 @@ class Common:
             self.assertTrue(found_resource.labels[label],
                 f'resource.labels[{label}] is not set')
 
-    def test_request_log(self):
-        if self.language not in ["nodejs"]:
-            return True
-        log_text = f"{inspect.currentframe().f_code.co_name}"
-        log_list = self.trigger_and_retrieve(log_text, "requestlog")
-        # Note: 2 logs are spawned, only one containing http_request prop.
-        log_entry = log_list[-1]
-        if log_entry.http_request is None:
-          log_entry = log_list[-2]
-        found_request = log_entry.http_request
-        if hasattr(self, 'request_props'):
-            for prop in self.request_props:
-                self.assertTrue(found_request[prop],
-                f'{prop} is not set')
-
     def test_severity(self):
-        if self.language not in ["python", "nodejs"]:
-            # to do: enable test for other languages
-            return True
         log_text = f"{inspect.currentframe().f_code.co_name}"
         severities = [
             "EMERGENCY",
