@@ -27,7 +27,12 @@ const defaultRequest = {
  * The following are test functions that can be triggered in each service.
  * envctl nodejs <env> trigger simplelog log_name=foo,log_text=bar
  */
-var simplelog = function(logname = "my-log", logtext = "hello world" ) {
+var simplelog = function(args) {
+  // set default values
+  const logname = "logname" in args ? args["logname"] : "my-log";
+  const logtext = "log_text" in args ? args["log_text"] : "simplelog";
+
+
   const log = logging.log(logname);
 
   const text_entry = log.entry(logtext);
@@ -38,8 +43,12 @@ var simplelog = function(logname = "my-log", logtext = "hello world" ) {
 /**
  * envctl nodejs <env> trigger requestlog log_name=foo,log_text=bar
  */
-var requestlog = function(logname = 'my-log', logtext = 'hello world', request) {
-  if (!request) request = defaultRequest;
+var requestlog = function(args) {
+  // set default values
+  const logname = "logname" in args ? args["logname"] : "my-log";
+  const logtext = "log_text" in args ? args["log_text"] : "requestlog";
+  const request = "request" in args ? args["request"] : defaultRequest;
+
   const log = logging.log(logname);
   const entry = log.entry({httpRequest: request}, logtext);
   log.write(entry).then(r => console.log(r));
@@ -48,8 +57,12 @@ var requestlog = function(logname = 'my-log', logtext = 'hello world', request) 
 /**
  * envctl nodejs <env> trigger stdoutlog log_name=foo,log_text=bar
  */
-var stdoutlog = function(logname = 'my-log', logtext = 'hello world', request) {
-  if (!request) request = defaultRequest;
+var stdoutlog = function(args) {
+  // set default values
+  const logname = "logname" in args ? args["logname"] : "my-log";
+  const logtext = "log_text" in args ? args["log_text"] : "stdoutlog";
+  const request = "request" in args ? args["request"] : defaultRequest;
+
   logging.setProjectId().then( res => {
     logging.setDetectedResource().then( res => {
       const log = logging.logSync(logname);

@@ -121,9 +121,6 @@ function triggerTest(message) {
       ? Buffer.from(message.data, 'base64').toString()
       : console.error("WARNING: no log function was invoked");
 
-  if (message.attributes) {
-    tests[testName](message.attributes['log_name'], message.attributes['log_text']);
-  } else {
-    tests[testName]();
-  }
+  args = message.attributes ? message.attributes : {};
+  tests[testName](args);
 }
