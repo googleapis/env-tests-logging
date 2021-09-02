@@ -32,7 +32,7 @@ var simplelog = function(logname = "my-log", logtext = "hello world" ) {
 
   const text_entry = log.entry(logtext);
 
-  log.write(text_entry).then(r => console.log(r));
+  log.write(text_entry);
 }
 
 /**

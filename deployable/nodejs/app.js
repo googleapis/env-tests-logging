@@ -75,7 +75,7 @@ if (process.env.RUNSERVER) {
   // Start app server
   const PORT = process.env.PORT || 8080;
   app.listen(PORT, () =>
-      console.log(`nodejs-pubsub-tutorial listening on port ${PORT}`)
+      console.log(`listening on port ${PORT}`)
   );
 }
 
@@ -120,9 +120,6 @@ function triggerTest(message) {
   const testName = message.data
       ? Buffer.from(message.data, 'base64').toString()
       : console.error("WARNING: no log function was invoked");
-
-  console.log('Fn invoked with attributes, if any: ');
-  console.log(message.attributes);
 
   if (message.attributes) {
     tests[testName](message.attributes['log_name'], message.attributes['log_text']);
