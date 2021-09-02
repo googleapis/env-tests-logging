@@ -189,7 +189,7 @@ class Common:
                 f'{prop} is not set')
 
     def test_severity(self):
-        if self.language != "python":
+        if self.language not in ["python", "nodejs"]:
             # to do: enable test for other languages
             return True
         log_text = f"{inspect.currentframe().f_code.co_name}"

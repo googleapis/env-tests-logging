@@ -31,11 +31,16 @@ var simplelog = function(args) {
   // set default values
   const logname = "logname" in args ? args["logname"] : "my-log";
   const logtext = "log_text" in args ? args["log_text"] : "simplelog";
+  const seveverity = "severity" in args ? args["severity"] : "ERROR";
 
 
   const log = logging.log(logname);
 
-  const text_entry = log.entry(logtext);
+  const metadata = {
+    severity: severity,
+  };
+
+  const text_entry = log.entry(metadata, logtext);
 
   log.write(text_entry);
 }
