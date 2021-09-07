@@ -69,3 +69,8 @@ EOF
   # deploy
   gcloud builds submit --config $TMP_DIR/cloudbuild.yaml --timeout 30m --async
 }
+
+filter-string() {
+  echo "resource.type=\"build\""
+}
+
