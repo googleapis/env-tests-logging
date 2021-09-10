@@ -90,6 +90,8 @@ class Common:
                 if ignore_protos:
                     # in most cases, we want to ignore AuditLogs in our tests
                     log_list = [l for l in log_list if not isinstance(l, ProtobufEntry)]
+                print(len(log_list))
+                print(log_list)
                 return log_list
             except (LogsNotFound, RpcError) as e:
                 sleep(5)
