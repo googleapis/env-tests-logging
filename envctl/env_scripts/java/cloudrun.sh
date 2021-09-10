@@ -23,7 +23,6 @@ SA_NAME=env-test-invoker
 
 add_service_accounts() {
   set +e
-  set -x
   local PROJECT_ID=$(gcloud config list --format 'value(core.project)')
   local PROJECT_NUMBER=$(gcloud projects list --filter=$PROJECT_ID --format="value(PROJECT_NUMBER)")
   gcloud projects add-iam-policy-binding $PROJECT_ID \
