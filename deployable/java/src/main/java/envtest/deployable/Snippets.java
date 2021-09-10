@@ -52,6 +52,7 @@ public class Snippets {
             LogEntry.newBuilder(StringPayload.of(logText))
                 .setSeverity(severity)
                 .setLogName(logName)
+                .setResource(MonitoredResource.newBuilder("global").build())
                 .build();
 
          //Writes the log entry asynchronously
