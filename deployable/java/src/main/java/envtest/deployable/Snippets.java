@@ -33,7 +33,6 @@ public class Snippets {
         String logText = args.getOrDefault("log_text", "simplelog");
         String logName = args.getOrDefault("log_name", "test");
         String severityString = args.getOrDefault("severity", "CRITICAL");
-        System.out.println(logText);
 
         // Set severity
         Severity severity;
