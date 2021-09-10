@@ -14,6 +14,7 @@
 
 import google.cloud.logging
 from google.cloud._helpers import UTC
+from google.cloud.logging_v2 import ProtobufEntry
 from google.cloud.logging_v2.handlers.handlers import CloudLoggingHandler
 from google.cloud.logging_v2.handlers.transports import SyncTransport
 from google.cloud.logging_v2 import Client
@@ -72,7 +73,7 @@ class Common:
 
     @RetryErrors(exception=(LogsNotFound, RpcError), delay=2, max_tries=2)
     def trigger_and_retrieve(
-        self, log_text, snippet, append_uuid=True, max_tries=6, **kwargs
+        self, log_text, snippet, append_uuid=True, ignore_protos=True, max_tries=6, **kwargs
     ):
         if append_uuid:
             log_text = f"{log_text} {uuid.uuid1()}"
@@ -86,6 +87,9 @@ class Common:
             # retrieve resulting logs
             try:
                 log_list = self._get_logs(filter_str)
+                if ignore_protos:
+                    # in most cases, we want to ignore AuditLogs in our tests
+                    log_list = [l for l in log_list if not isinstance(l, ProtobufEntry)]
                 print(len(log_list))
                 print(log_list[0])
                 print(log_list[0].payload)
