@@ -19,7 +19,7 @@ set -u # undefined variables cause exit
 
 
 SERVICE_NAME="log-java-run-$(echo $ENVCTL_ID | head -c 10)"
-SA_NAME=$SERVICE_NAME-invoker
+SA_NAME=env-test-invoker
 
 add_service_accounts() {
   set +e

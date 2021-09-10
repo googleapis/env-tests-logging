@@ -59,6 +59,8 @@ deploy() {
   runtime: custom
   service: $SERVICE_NAME
   env: flex
+  featureSettings:
+    splitHealthChecks: true
   manual_scaling:
     instances: 1
   env_variables:
