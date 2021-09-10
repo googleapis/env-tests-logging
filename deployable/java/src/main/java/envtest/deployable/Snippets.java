@@ -22,6 +22,7 @@ import com.google.cloud.logging.Logging;
 import com.google.cloud.logging.LoggingOptions;
 import com.google.cloud.logging.Payload.StringPayload;
 import com.google.cloud.logging.Severity;
+import com.google.cloud.logging.MonitoredResourceUtil;
 import com.google.logging.type.LogSeverity;
 
 public class Snippets {
@@ -31,15 +32,26 @@ public class Snippets {
         // pull out arguments
         String logText = args.getOrDefault("log_text", "simplelog");
         String logName = args.getOrDefault("log_name", "test");
-        String severityString = args.getOrDefault("severity", "DEFAULT");
+        String severityString = args.getOrDefault("severity", "CRITICAL");
+
+        // Set severity
+        Severity severity;
+        if (severityString.equals("DEBUG")){
+            severity = Severity.DEBUG;
+        } else if(severityString.equals("INFO")){
+            severity = Severity.INFO;
+        } else if(severityString.equals("WARNING")){
+            severity = Severity.WARNING;
+        } else {
+            severity = Severity.CRITICAL;
+        }
 
         // Instantiates a client
         Logging logging = LoggingOptions.getDefaultInstance().getService();
         LogEntry entry =
             LogEntry.newBuilder(StringPayload.of(logText))
-                .setSeverity(Severity.ERROR)
+                .setSeverity(severity)
                 .setLogName(logName)
-                .setResource(MonitoredResource.newBuilder("global").build())
                 .build();
 
          //Writes the log entry asynchronously
