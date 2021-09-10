@@ -57,11 +57,14 @@ class Common:
             timestamp = datetime.now(timezone.utc) - timedelta(minutes=10)
         return f'"{filter_str}" AND timestamp > "{timestamp.strftime(time_format)}"'
 
-    def _get_logs(self, filter_str=None):
+    def _get_logs(self, filter_str=None, ignore_protos=True):
         if not filter_str:
             _, filter_str, _ = self._script.run_command(Command.GetFilter)
         iterator = self._client.list_entries(filter_=filter_str)
         entries = list(iterator)
+        if ignore_protos:
+            # in most cases, we want to ignore AuditLogs in our tests
+            entries = [e for e in entries if not isinstance(e, ProtobufEntry)]
         if not entries:
             raise LogsNotFound
         return entries
@@ -86,10 +89,7 @@ class Common:
         while tries < max_tries:
             # retrieve resulting logs
             try:
-                log_list = self._get_logs(filter_str)
-                if ignore_protos:
-                    # in most cases, we want to ignore AuditLogs in our tests
-                    log_list = [l for l in log_list if not isinstance(l, ProtobufEntry)]
+                log_list = self._get_logs(filter_str, ignore_protos)
                 print(len(log_list))
                 print(log_list)
                 return log_list
