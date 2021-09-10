@@ -86,6 +86,9 @@ class Common:
             # retrieve resulting logs
             try:
                 log_list = self._get_logs(filter_str)
+                print(len(log_list))
+                print(log_list[0])
+                print(log_list[0].payload)
                 return log_list
             except (LogsNotFound, RpcError) as e:
                 sleep(5)
