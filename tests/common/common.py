@@ -65,9 +65,6 @@ class Common:
         if ignore_protos:
             # in most cases, we want to ignore AuditLogs in our tests
             entries = [e for e in entries if not isinstance(e, ProtobufEntry)]
-        print(len(entries))
-        print(entries)
-        print(bool(entries))
         if not entries:
             raise LogsNotFound
         return entries
@@ -95,6 +92,7 @@ class Common:
                 log_list = self._get_logs(filter_str, ignore_protos)
                 return log_list
             except (LogsNotFound, RpcError) as e:
+                print("logs not found...")
                 sleep(5)
                 tries += 1
         # log not found
