@@ -262,3 +262,10 @@ class CommonPython:
                 found_log.source_location.get(field, None),
                 f"source_location[{field}] is unexpectedly not None",
             )
+
+    def test_pylogging_exception(self):
+        log_text = f"{inspect.currentframe().f_code.co_name}"
+        log_list = self.trigger_and_retrieve(log_text, "pylogging_exception")
+        found_log = log_list[-1]
+
+        self.assertEqual(log.payload, log_text)

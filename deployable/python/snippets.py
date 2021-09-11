@@ -132,6 +132,11 @@ def pylogging_flask(
     ):
         logging.info(log_text)
 
+def pylogging_exception(log_text="pylogging_exception", **kwargs):
+    try:
+        raise Exception("Test")
+    except Exception:
+        logger.exception(log_text)
 
 def print_handlers(**kwargs):
     root_logger = logging.getLogger()
