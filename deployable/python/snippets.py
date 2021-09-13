@@ -132,9 +132,9 @@ def pylogging_flask(
     ):
         logging.info(log_text)
 
-def pylogging_exception(log_text="pylogging_exception", **kwargs):
+def pylogging_exception(log_text="pylogging_exception", exception_text="Test", **kwargs):
     try:
-        raise Exception("Test")
+        raise Exception(exception_text)
     except Exception:
         logging.exception(log_text)
 

@@ -265,7 +265,11 @@ class CommonPython:
 
     def test_pylogging_exception(self):
         log_text = f"{inspect.currentframe().f_code.co_name}"
-        log_list = self.trigger_and_retrieve(log_text, "pylogging_exception")
+        exception_text = "test_exception"
+        log_list = self.trigger_and_retrieve(log_text, "pylogging_exception",
+                exception_text=exception_text)
         found_log = log_list[-1]
 
-        self.assertEqual(log.payload, log_text)
+        self.assertIn(log.payload, log_text)
+        self.assertIn(f'raise Exception("{exception_text}")', log_text)
+        self.assertIn("Traceback (most recent call last):", log_text)
