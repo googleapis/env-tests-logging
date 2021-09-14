@@ -19,10 +19,8 @@ import inspect
 import google.cloud.logging
 
 from ..common.common import Common
-from ..common.stdout import CommonStdout
 
-
-class TestKubernetesEngine(Common, CommonStdout, unittest.TestCase):
+class TestKubernetesEngine(Common, unittest.TestCase):
 
     environment = "kubernetes"
     language = "nodejs"
@@ -36,30 +34,3 @@ class TestKubernetesEngine(Common, CommonStdout, unittest.TestCase):
         "namespace_name",
     ]
 
-    request_props = [
-        "requestMethod",
-        "requestUrl",
-        "protocol",
-    ]
-
-    stdout_payload_props = [
-        "message",
-        "resource",
-        "timestamp",
-        "logName",
-    ]
-    stdout_severity = "WARNING"
-    stdout_request_props = request_props
-    stdout_labels = [
-        "foo",
-    ]
-    stdout_insert_id = "42"
-    # substring to test for
-    stdout_trace = "/traces/0679686673a"
-    stdout_span_id = "000000000000004a"
-    stdout_trace_sampled = "true"
-
-    # Not lifted and just left in JSONPayload:
-    # stdout_resource_type
-    # stdout_timestamp
-    # stdout_log_name: in GKE it looks like /logs/stdout. weird
