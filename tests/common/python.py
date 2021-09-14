@@ -270,9 +270,9 @@ class CommonPython:
                 exception_text=exception_text)
         found_log = log_list[-1]
 
-        message = (log.payload.get("message", None)
-                    if isinstance(log.payload, dict)
-                    else str(log.payload))
+        message = (found_log.payload.get("message", None)
+                    if isinstance(found_log.payload, dict)
+                    else str(found_log.payload))
 
         self.assertIn(log_text, message)
         self.assertIn(f"Exception: {exception_text}", message)
