@@ -270,6 +270,10 @@ class CommonPython:
                 exception_text=exception_text)
         found_log = log_list[-1]
 
-        self.assertIn(log_text, found_log.payload)
-        self.assertIn(f"Exception: {exception_text}", found_log.payload)
-        self.assertIn("Traceback (most recent call last):", found_log.payload)
+        message = (log.payload.get("message", None) 
+                    if isinstance(log.payload, dict)
+                    else str(log.payload)))
+
+        self.assertIn(log_text, message)
+        self.assertIn(f"Exception: {exception_text}", message)
+        self.assertIn("Traceback (most recent call last):", message)
