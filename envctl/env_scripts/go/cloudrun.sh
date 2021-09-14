@@ -18,7 +18,7 @@ set -o pipefail # any step in pipe caused failure
 set -u # undefined variables cause exit
 
 # Note: there is a max character count constraint
-SERVICE_NAME="log-go-run-$(echo $ENVCTL_ID | head -c 8)x"
+SERVICE_NAME="log-go-run-$(echo $ENVCTL_ID | head -c 8)"
 SA_NAME=$SERVICE_NAME-invoker
 
 add_service_accounts() {
