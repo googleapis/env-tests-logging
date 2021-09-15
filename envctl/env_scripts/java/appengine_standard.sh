@@ -68,7 +68,7 @@ deploy() {
 EOF
   # deploy
   pushd $TMP_DIR
-    gcloud app deploy \
+    gcloud beta app deploy \
       --service-account=it-service-account@gcloud-devel.iam.gserviceaccount.com
       --appyaml $TMP_DIR/app.yaml \
       $TMP_DIR/deployable-1.0.0.jar -q
