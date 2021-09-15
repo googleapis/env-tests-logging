@@ -61,6 +61,7 @@ deploy() {
     service: $SERVICE_NAME
     manual_scaling:
       instances: 1
+    service_account: it-service-account@gcloud-devel.iam.gserviceaccount.com
     env_variables:
       ENABLE_SUBSCRIBER: "true"
       RUNSERVER: "false"
