@@ -22,11 +22,11 @@ SERVICE_NAME="logging-java-standard-$(echo $ENVCTL_ID | head -c 10)"\
 
 destroy() {
   set +e
+  # delete service
+  gcloud app services delete $SERVICE_NAME
   # delete pubsub resources
   gcloud pubsub topics delete $SERVICE_NAME -q 2> /dev/null
   gcloud pubsub subscriptions delete $SERVICE_NAME-subscriber -q 2> /dev/null
-  # delete service
-  gcloud app services delete $SERVICE_NAME -q 2> /dev/null
   set -e
 }
 
