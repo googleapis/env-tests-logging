@@ -23,7 +23,11 @@ SERVICE_NAME="logging-java-standard-$(echo $ENVCTL_ID | head -c 10)"\
 destroy() {
   set +e
   # delete service
-  gcloud app services delete $SERVICE_NAME
+  gcloud app services delete $SERVICE_NAME -q 2> /dev/null
+  # delete other services
+  for uuid in 9a685ab 209852a 01fcae2 cc76976 ba608bd 70a06c8  f6b1e60 6d8e1a9 fe11c16  e51c1fe e740737; do
+    gcloud app services delete logging-java-standard-ci-$uuid -q
+  done
   # delete pubsub resources
   gcloud pubsub topics delete $SERVICE_NAME -q 2> /dev/null
   gcloud pubsub subscriptions delete $SERVICE_NAME-subscriber -q 2> /dev/null

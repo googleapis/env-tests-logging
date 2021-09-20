@@ -48,6 +48,10 @@ verify() {
 
 
 deploy() {
+  # update health checks
+  set -x
+  gcloud app update --split-health-checks --project gcloud-devel
+  set +x
   # create pub/sub topic
   set +e
   gcloud pubsub topics create $SERVICE_NAME 2>/dev/null
