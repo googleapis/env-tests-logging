@@ -71,6 +71,11 @@ public final class DeployableHttpController {
         return message;
     }
 
+    /**
+     * This function will be triggered by incomming pub/sub messages from envctl.
+     * It will then find and execute the requested test snippet, based on the
+     * contents of the pub/sub payload
+     */
     @RequestMapping(value = "/", method = RequestMethod.POST)
     public ResponseEntity pubsub_receive(@RequestBody Map<String, Object> payload) {
         Map<String, Object> pubsubMessage = (Map<String, Object>) payload.get("message");

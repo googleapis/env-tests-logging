@@ -24,17 +24,11 @@ import com.google.cloud.logging.Payload.StringPayload;
 import com.google.cloud.logging.Severity;
 import com.google.cloud.logging.MonitoredResourceUtil;
 import com.google.logging.type.LogSeverity;
+import com.google.cloud.logging.Synchronicity;
 
 public class Snippets {
 
-    public void simplelog(Map<String,String> args){
-        System.out.println("Called Simplelog!");
-        // pull out arguments
-        String logText = args.getOrDefault("log_text", "simplelog");
-        String logName = args.getOrDefault("log_name", "test");
-        String severityString = args.getOrDefault("severity", "CRITICAL");
-
-        // Set severity
+    private Severity getSeverity(String severity){
         Severity severity;
         if (severityString.equals("DEBUG")){
             severity = Severity.DEBUG;
@@ -55,6 +49,18 @@ public class Snippets {
         } else {
             severity = Severity.DEFAULT;
         }
+        return severity
+    }
+
+    public void simplelog(Map<String,String> args){
+        System.out.println("Called Simplelog!");
+        // pull out arguments
+        String logText = args.getOrDefault("log_text", "simplelog");
+        String logName = args.getOrDefault("log_name", "test");
+        String severityString = args.getOrDefault("severity", "DEFAULT");
+
+        // Set severity
+        Severity severity = getSeverity(severityString)
 
         // Instantiates a client
         Logging logging = LoggingOptions.getDefaultInstance().getService();

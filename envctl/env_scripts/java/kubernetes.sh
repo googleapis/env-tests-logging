@@ -58,7 +58,7 @@ attach_or_create_gke_cluster(){
     echo "cluster not found. creating..."
     gcloud container clusters create $SERVICE_NAME \
       --zone $ZONE \
-      --scopes=gke-default,pubsub,cloud-platform \
+      --scopes=cloud-platform \
       --no-enable-ip-alias
   fi
   set -e

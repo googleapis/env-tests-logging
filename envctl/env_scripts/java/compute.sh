@@ -63,8 +63,7 @@ deploy() {
 }
 
 filter-string() {
-  #INSTANCE_ID=$(gcloud compute instances list --filter="name~^$SERVICE_NAME$" --format="value(ID)")
-  #echo "resource.type=\"gce_instance\" AND resource.labels.instance_id=\"$INSTANCE_ID\""
-  echo "resource.type=\"global\""
+  INSTANCE_ID=$(gcloud compute instances list --filter="name~^$SERVICE_NAME$" --format="value(ID)")
+  echo "resource.type=\"gce_instance\" AND resource.labels.instance_id=\"$INSTANCE_ID\""
 }
 

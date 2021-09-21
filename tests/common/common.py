@@ -52,12 +52,27 @@ class Common:
     monitored_resource_labels = None
 
     def _add_time_condition_to_filter(self, filter_str, timestamp=None):
+        """
+        Appends a 10 minute limit to an arbitrary filter string
+        """
         time_format = "%Y-%m-%dT%H:%M:%S.%f%z"
         if not timestamp:
             timestamp = datetime.now(timezone.utc) - timedelta(minutes=10)
         return f'"{filter_str}" AND timestamp > "{timestamp.strftime(time_format)}"'
 
     def _get_logs(self, filter_str=None, ignore_protos=True):
+        """
+        Helper function to retrieve the text and json logs using an input
+        filter string.
+
+        Parameters:
+            filter_str (str): the filter string determining which logs to include
+            ignore_protos (bool): when disabled, matching protobuf entries will be included.
+                This may result false positives from AuditLogs on certain projects
+
+        Returns:
+            list[LogEntry]
+        """
         if not filter_str:
             _, filter_str, _ = self._script.run_command(Command.GetFilter)
         iterator = self._client.list_entries(filter_=filter_str)
@@ -70,6 +85,9 @@ class Common:
         return entries
 
     def _trigger(self, snippet, **kwargs):
+        """
+        Helper function for triggering a snippet deployed in a cloud environment
+        """
         timestamp = datetime.now(timezone.utc)
         args_str = ",".join([f'{k}="{v}"' for k, v in kwargs.items()])
         self._script.run_command(Command.Trigger, [snippet, args_str])
@@ -78,6 +96,25 @@ class Common:
     def trigger_and_retrieve(
         self, log_text, snippet, append_uuid=True, ignore_protos=True, max_tries=6, **kwargs
     ):
+        """
+        Trigger a snippet deployed in the cloud by envctl, and return resulting
+        logs.
+
+        Parameters:
+            log_text (str): passed as an argument to the snippet function.
+                Typically used for the body of the resulting log,
+            snippet (str): the name of the snippet to trigger.
+            append_uuid (bool): when true, appends a unique suffix to log_text,
+                to ensure old logs aren't picket up in later runs
+            ignore_protos: when disabled, matching protobuf entries will be included.
+                This may result false positives from AuditLogs on certain projects
+            max_tries (int): number of times to retry if logs haven't been found
+            **kwargs: additional arguments are passed as arguments to the snippet function
+
+        Returns:
+            list[LogEntry]
+        """
+
         if append_uuid:
             log_text = f"{log_text} {uuid.uuid1()}"
         self._trigger(snippet, log_text=log_text, **kwargs)
