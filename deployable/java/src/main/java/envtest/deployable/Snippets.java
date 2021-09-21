@@ -28,7 +28,7 @@ import com.google.cloud.logging.Synchronicity;
 
 public class Snippets {
 
-    private Severity getSeverity(String severity){
+    private Severity getSeverity(String severityString){
         Severity severity;
         if (severityString.equals("DEBUG")){
             severity = Severity.DEBUG;
@@ -49,7 +49,7 @@ public class Snippets {
         } else {
             severity = Severity.DEFAULT;
         }
-        return severity
+        return severity;
     }
 
     public void simplelog(Map<String,String> args){
@@ -60,7 +60,7 @@ public class Snippets {
         String severityString = args.getOrDefault("severity", "DEFAULT");
 
         // Set severity
-        Severity severity = getSeverity(severityString)
+        Severity severity = getSeverity(severityString);
 
         // Instantiates a client
         Logging logging = LoggingOptions.getDefaultInstance().getService();
