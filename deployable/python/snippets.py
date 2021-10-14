@@ -163,6 +163,16 @@ def pylogging_flask(
     ):
         logging.info(log_text)
 
+def pylogging_pandas(log_text="pylogging_pandas", **kwargs):
+    """
+    Ensure pandas dataframes are handled properly
+    https://github.com/googleapis/python-logging/issues/409
+    """
+    import pandas as pd
+    df = pd.DataFrame(columns=['log_text'])
+    df = df.append({"log_text": log_text}, ignore_index=True)
+    logging.error(df)
+
 def pylogging_exception(log_text="pylogging_exception", exception_text="Test", **kwargs):
     try:
         raise Exception(exception_text)

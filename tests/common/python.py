@@ -292,3 +292,23 @@ class CommonPython:
         self.assertIn(log_text, message)
         self.assertIn(f"Exception: {exception_text}", message)
         self.assertIn("Traceback (most recent call last):", message)
+
+    def test_pylogging_pandas(self):
+        """
+        Ensure pandas dataframes are parsed without crashing
+        https://github.com/googleapis/python-logging/issues/409
+        """
+        import pandas as pd
+        log_text = f"{inspect.currentframe().f_code.co_name} {str(uuid.uuid1())[-10:]}"
+
+        log_list = self.trigger_and_retrieve(log_text, "pylogging_pandas", append_uuid=False)
+        found_log = log_list[-1]
+
+        message = (found_log.payload.get("message", None)
+                    if isinstance(found_log.payload, dict)
+                    else str(found_log.payload))
+
+        df = pd.DataFrame(columns=['log_text'])
+        df = df.append({"log_text": log_text}, ignore_index=True)
+
+        self.assertEqual(str(df), message)
