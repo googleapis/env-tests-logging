@@ -200,8 +200,9 @@ class Common:
         self.assertIsNotNone(found_log, "expected unicode log not found")
 
     def test_monitored_resource(self):
-        if self.language == 'java':
+        if self.language == 'java' or self.language == 'python':
             # TODO: implement in java
+            # TODO: remove python after v3.0.0
             return True
 
         log_text = f"{inspect.currentframe().f_code.co_name}"
