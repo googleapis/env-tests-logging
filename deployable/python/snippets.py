@@ -39,25 +39,54 @@ def simplelog(log_name=None, log_text="simple_log", severity="DEFAULT", **kwargs
     logger.log_text(log_text, severity=severity)
 
 
+def pylogging_json(log_text=None, severity="WARNING", **kwargs):
+    # allowed severity: debug, info, warning, error, critical
+
+    # build json message
+    message = {}
+    for k in kwargs.keys():
+        message[k] = kwargs[k]
+
+    severity = severity.upper()
+    if severity == "DEBUG":
+        logging.debug(message)
+    elif severity == "INFO":
+        logging.info(message)
+    elif severity == "WARNING":
+        logging.warning(message)
+    elif severity == "ERROR":
+        logging.error(message)
+    else:
+        logging.critical(message)
+
 def pylogging(log_text="pylogging", severity="WARNING", **kwargs):
     # allowed severity: debug, info, warning, error, critical
 
     # build http request if fields given as argument
-    http_keys =  ["protocol", "requestUrl", "userAgent", "requestMethod"]
+    http_keys = ["protocol", "requestUrl", "userAgent", "requestMethod"]
     if any([k in kwargs for k in http_keys]):
         http_request = {}
         for key in http_keys:
             if key in kwargs:
                 http_request[key] = kwargs[key]
-        kwargs['http_request'] = http_request
+        kwargs["http_request"] = http_request
     # build source location if given as argument
-    source_keys =  ["line", "file", "function"]
+    source_keys = ["line", "file", "function"]
     if any([k in kwargs for k in http_keys]):
         source_location = {}
         for key in source_keys:
             if key in kwargs:
                 source_location[key] = kwargs[key]
-        kwargs['source_location'] = source_location
+        kwargs["source_location"] = source_location
+    # build custom labels
+    label_prefix = "label_"
+    label_keys = [k for k in kwargs.keys() if k.startswith(label_prefix)]
+    if label_keys:
+        labels = {}
+        for k in label_keys:
+            adjusted_key = k[len(label_prefix) :]
+            labels[adjusted_key] = kwargs[k]
+        kwargs["labels"] = labels
 
     severity = severity.upper()
     if severity == "DEBUG":
@@ -71,12 +100,43 @@ def pylogging(log_text="pylogging", severity="WARNING", **kwargs):
     else:
         logging.critical(log_text, extra=kwargs)
 
-def pylogging_flask(log_text="pylogging_flask", path="/", base_url="http://google", agent="Chrome", trace="123", **kwargs):
+def pylogging_multiline(log_text="pylogging", second_line="line 2", **kwargs):
+    logging.error(f"{log_text}\n{second_line}")
+
+def pylogging_complex_chars(**kwargs):
+    logging.error('}"{!@[')
+
+def pylogging_with_formatter(log_text="pylogging", format_str="%(name)s :: %(levelname)s :: %(message)s", **kwargs):
+    root_logger = logging.getLogger()
+    handler = root_logger.handlers[0]
+    handler.setFormatter(logging.Formatter(fmt=format_str))
+    logging.error(log_text)
+    handler.setFormatter(None)
+
+def pylogging_with_arg(log_text="my_arg", **kwargs):
+    logging.error("Arg: %s", log_text)
+
+def pylogging_flask(
+    log_text="pylogging_flask",
+    path="/",
+    base_url="http://google",
+    agent="Chrome",
+    trace="123",
+    **kwargs,
+):
     import flask
+
     app = flask.Flask(__name__)
     with app.test_request_context(
-            path, base_url, headers={'User-Agent': agent, "X_CLOUD_TRACE_CONTEXT": trace}):
+        path, base_url, headers={"User-Agent": agent, "X_CLOUD_TRACE_CONTEXT": trace}
+    ):
         logging.info(log_text)
+
+def pylogging_exception(log_text="pylogging_exception", exception_text="Test", **kwargs):
+    try:
+        raise Exception(exception_text)
+    except Exception:
+        logging.exception(log_text)
 
 def print_handlers(**kwargs):
     root_logger = logging.getLogger()

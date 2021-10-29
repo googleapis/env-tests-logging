@@ -24,15 +24,16 @@ from ..common.common import Common
 
 class TestCloudRun(Common, unittest.TestCase):
 
-  environment = "cloudrun"
-  language = "nodejs"
+    environment = "cloudrun"
+    language = "nodejs"
 
-  # What it should be
-  monitored_resource_name = "cloud_run_revision"
-  monitored_resource_labels = [
-      "project_id",
-      "service_name",
-      "revision_name",
-      "location",
-      "configuration_name",
-  ]
+    # What it should be
+    monitored_resource_name = "cloud_run_revision"
+    monitored_resource_labels = [
+        "project_id",
+        "service_name",
+        "revision_name",
+        "location",
+        "configuration_name",
+    ]
+

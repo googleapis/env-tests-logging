@@ -19,13 +19,24 @@ const logging = new Logging();
  * The following are test functions that can be triggered in each service.
  * envctl nodejs <env> trigger simplelog log_name=foo,log_text=bar
  */
-var simplelog = function(logname = "my-log", logtext = "hello world" ) {
+var simplelog = function(args) {
+  // set default values
+  const logname = "logname" in args ? args["logname"] : "my-log";
+  const logtext = "log_text" in args ? args["log_text"] : "simplelog";
+  const severity = "severity" in args ? args["severity"] : "ERROR";
+
   const log = logging.log(logname);
 
-  const text_entry = log.entry(logtext);
+  const metadata = {
+    severity: severity,
+  };
 
-  log.write(text_entry).then(r => console.log(r));
+  const text_entry = log.entry(metadata, logtext);
+
+  log.write(text_entry);
 }
 
-module.exports={ 'simplelog': simplelog }
+module.exports={
+  'simplelog': simplelog,
+}
 

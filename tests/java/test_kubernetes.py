@@ -1,4 +1,4 @@
-# Copyright 2016 Google LLC
+# Copyright 2021 Google LLC
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -14,13 +14,16 @@
 
 import logging
 import unittest
+import inspect
 
 import google.cloud.logging
 
 from ..common.common import Common
 
 
-class TestAppEngineFlexContainer(Common, unittest.TestCase):
+class TestKubernetesEngine(Common, unittest.TestCase):
+    environment = "kubernetes"
+    language = "java"
 
-    environment = "appengine_flex_container"
-    language = "go"
+    monitored_resource_name = "k8s_container"
+    monitored_resource_labels = ["project_id", "location", "cluster_name", "pod_name", "namespace_name"]

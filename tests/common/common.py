@@ -14,6 +14,7 @@
 
 import google.cloud.logging
 from google.cloud._helpers import UTC
+from google.cloud.logging_v2 import ProtobufEntry
 from google.cloud.logging_v2.handlers.handlers import CloudLoggingHandler
 from google.cloud.logging_v2.handlers.transports import SyncTransport
 from google.cloud.logging_v2 import Client
@@ -51,42 +52,84 @@ class Common:
     monitored_resource_labels = None
 
     def _add_time_condition_to_filter(self, filter_str, timestamp=None):
+        """
+        Appends a 10 minute limit to an arbitrary filter string
+        """
         time_format = "%Y-%m-%dT%H:%M:%S.%f%z"
         if not timestamp:
             timestamp = datetime.now(timezone.utc) - timedelta(minutes=10)
         return f'"{filter_str}" AND timestamp > "{timestamp.strftime(time_format)}"'
 
-    def _get_logs(self, filter_str=None):
+    def _get_logs(self, filter_str=None, ignore_protos=True):
+        """
+        Helper function to retrieve the text and json logs using an input
+        filter string.
+
+        Parameters:
+            filter_str (str): the filter string determining which logs to include
+            ignore_protos (bool): when disabled, matching protobuf entries will be included.
+                This may result false positives from AuditLogs on certain projects
+
+        Returns:
+            list[LogEntry]
+        """
         if not filter_str:
-            _, filter_str = self._script.run_command(Command.GetFilter)
+            _, filter_str, _ = self._script.run_command(Command.GetFilter)
         iterator = self._client.list_entries(filter_=filter_str)
         entries = list(iterator)
+        if ignore_protos:
+            # in most cases, we want to ignore AuditLogs in our tests
+            entries = [e for e in entries if not isinstance(e, ProtobufEntry)]
         if not entries:
             raise LogsNotFound
         return entries
 
     def _trigger(self, snippet, **kwargs):
+        """
+        Helper function for triggering a snippet deployed in a cloud environment
+        """
         timestamp = datetime.now(timezone.utc)
         args_str = ",".join([f'{k}="{v}"' for k, v in kwargs.items()])
         self._script.run_command(Command.Trigger, [snippet, args_str])
 
     @RetryErrors(exception=(LogsNotFound, RpcError), delay=2, max_tries=2)
     def trigger_and_retrieve(
-        self, log_text, snippet, append_uuid=True, max_tries=6, **kwargs
+        self, log_text, snippet, append_uuid=True, ignore_protos=True, max_tries=6, **kwargs
     ):
+        """
+        Trigger a snippet deployed in the cloud by envctl, and return resulting
+        logs.
+
+        Parameters:
+            log_text (str): passed as an argument to the snippet function.
+                Typically used for the body of the resulting log,
+            snippet (str): the name of the snippet to trigger.
+            append_uuid (bool): when true, appends a unique suffix to log_text,
+                to ensure old logs aren't picket up in later runs
+            ignore_protos: when disabled, matching protobuf entries will be included.
+                This may result false positives from AuditLogs on certain projects
+            max_tries (int): number of times to retry if logs haven't been found
+            **kwargs: additional arguments are passed as arguments to the snippet function
+
+        Returns:
+            list[LogEntry]
+        """
+
         if append_uuid:
             log_text = f"{log_text} {uuid.uuid1()}"
         self._trigger(snippet, log_text=log_text, **kwargs)
         sleep(2)
         filter_str = self._add_time_condition_to_filter(log_text)
+        print(filter_str)
         # give the command time to be received
         tries = 0
         while tries < max_tries:
             # retrieve resulting logs
             try:
-                log_list = self._get_logs(filter_str)
+                log_list = self._get_logs(filter_str, ignore_protos)
                 return log_list
             except (LogsNotFound, RpcError) as e:
+                print("logs not found...")
                 sleep(5)
                 tries += 1
         # log not found
@@ -100,19 +143,23 @@ class Common:
             raise NotImplementedError("language not set by subclass")
         cls._script = ScriptRunner(cls.environment, cls.language)
         # check if already setup
-        status, _ = cls._script.run_command(Command.Verify)
+        status, _, _ = cls._script.run_command(Command.Verify)
         if status == 0:
             if os.getenv("NO_CLEAN"):
                 # ready to go
                 return
             else:
                 # reset environment
-                status, _ = cls._script.run_command(Command.Destroy)
+                status, _, _ = cls._script.run_command(Command.Destroy)
                 assert status == 0
         # deploy test code to GCE
-        status, _ = cls._script.run_command(Command.Deploy)
+        status, _, err = cls._script.run_command(Command.Deploy)
+        if status != 0:
+            print(err)
         # verify code is running
-        status, _ = cls._script.run_command(Command.Verify)
+        status, _, err = cls._script.run_command(Command.Verify)
+        if status != 0:
+            print(err)
         assert status == 0
 
     @classmethod
@@ -137,27 +184,39 @@ class Common:
                 found_log = log
         self.assertIsNotNone(found_log, "expected log text not found")
 
-    # add back after v3.0.0
-    # def test_monitored_resource(self):
-    #     if self.language != "python":
-    #         # to do: add monitored resource info to go
-    #         return True
-    #     log_text = f"{inspect.currentframe().f_code.co_name}"
-    #     log_list = self.trigger_and_retrieve(log_text, "simplelog")
-    #     found_resource = log_list[-1].resource
+    def test_receive_unicode_log(self):
+        log_text = f"{inspect.currentframe().f_code.co_name} 嗨 世界 😀"
+        log_list = self.trigger_and_retrieve(log_text, "simplelog")
 
-    #     self.assertIsNotNone(self.monitored_resource_name)
-    #     self.assertIsNotNone(self.monitored_resource_labels)
+        found_log = None
+        for log in log_list:
+            message = (
+                log.payload.get("message", None)
+                if isinstance(log.payload, dict)
+                else str(log.payload)
+            )
+            if message and log_text in message:
+                found_log = log
+        self.assertIsNotNone(found_log, "expected unicode log not found")
 
-    #     self.assertEqual(found_resource.type, self.monitored_resource_name)
-    #     for label in self.monitored_resource_labels:
-    #         self.assertTrue(found_resource.labels[label],
-    #             f'resource.labels[{label}] is not set')
+    def test_monitored_resource(self):
+        if self.language == 'java':
+            # TODO: implement in java
+            return True
+
+        log_text = f"{inspect.currentframe().f_code.co_name}"
+        log_list = self.trigger_and_retrieve(log_text, "simplelog")
+        found_resource = log_list[-1].resource
+
+        self.assertIsNotNone(self.monitored_resource_name)
+        self.assertIsNotNone(self.monitored_resource_labels)
+
+        self.assertEqual(found_resource.type, self.monitored_resource_name)
+        for label in self.monitored_resource_labels:
+            self.assertTrue(found_resource.labels[label],
+                f'resource.labels[{label}] is not set')
 
     def test_severity(self):
-        if self.language != "python":
-            # to do: enable test for other languages
-            return True
         log_text = f"{inspect.currentframe().f_code.co_name}"
         severities = [
             "EMERGENCY",
@@ -170,7 +229,9 @@ class Common:
             "DEBUG",
         ]
         for severity in severities:
-            log_list = self.trigger_and_retrieve(log_text, "simplelog", severity=severity)
+            log_list = self.trigger_and_retrieve(
+                log_text, "simplelog", severity=severity
+            )
             found_severity = log_list[-1].severity
             self.assertEqual(found_severity.lower(), severity.lower())
         # DEFAULT severity should result in empty field

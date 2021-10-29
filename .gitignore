@@ -1,3 +1,5 @@
+.idea
+
 # Byte-compiled / optimized / DLL files
 __pycache__/
 *.py[cod]
@@ -139,5 +141,6 @@ cython_debug/
 
 # Go files
 deployable/go/google-cloud-go
+deployable/go/logging
 deployable/go/lib.tar
 deployable/go/vendor
