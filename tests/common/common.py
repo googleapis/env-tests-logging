@@ -217,9 +217,8 @@ class Common:
         self.assertEqual(found_log.payload, expected_dict)
 
     def test_monitored_resource(self):
-        if self.language == 'java' or self.language == 'python':
+        if self.language == 'java':
             # TODO: implement in java
-            # TODO: remove python after v3.0.0
             return True
 
         log_text = f"{inspect.currentframe().f_code.co_name}"
