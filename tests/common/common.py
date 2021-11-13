@@ -30,6 +30,7 @@ import os
 import sys
 import uuid
 import inspect
+import random
 
 from test_utils.retry import RetryErrors
 from grpc import RpcError
@@ -94,7 +95,7 @@ class Common:
 
     @RetryErrors(exception=(LogsNotFound, RpcError), delay=2, max_tries=2)
     def trigger_and_retrieve(
-        self, log_text, snippet, append_uuid=True, ignore_protos=True, max_tries=6, **kwargs
+        self, log_text, snippet, append_uuid=True, ignore_protos=True, max_tries=3, **kwargs
     ):
         """
         Trigger a snippet deployed in the cloud by envctl, and return resulting
@@ -118,7 +119,7 @@ class Common:
         if append_uuid:
             log_text = f"{log_text} {uuid.uuid1()}"
         self._trigger(snippet, log_text=log_text, **kwargs)
-        sleep(2)
+        sleep(5)
         filter_str = self._add_time_condition_to_filter(log_text)
         print(filter_str)
         # give the command time to be received
@@ -128,9 +129,19 @@ class Common:
             try:
                 log_list = self._get_logs(filter_str, ignore_protos)
                 return log_list
-            except (LogsNotFound, RpcError) as e:
+            except RpcError as e:
+                print(f"RPC error: {e}")
+                # most RpcErrors come from exceeding the reads per minute quota
+                # wait at least 60 seconds
+                # use a randomized backoff so parallel runs don't start up at 
+                # the same time again
+                sleep(random.randint(60, 300))
+                tries += 1
+            except LogsNotFound as e:
                 print("logs not found...")
-                sleep(5)
+                # logs may not have been fully ingested into Cloud Logging
+                # Wait another 10 seconds
+                sleep(10)
                 tries += 1
         # log not found
         raise LogsNotFound
