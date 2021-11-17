@@ -119,7 +119,7 @@ class Common:
         if append_uuid:
             log_text = f"{log_text} {uuid.uuid1()}"
         self._trigger(snippet, log_text=log_text, **kwargs)
-        sleep(5)
+        sleep(10)
         filter_str = self._add_time_condition_to_filter(log_text)
         print(filter_str)
         # give the command time to be received
@@ -140,8 +140,8 @@ class Common:
             except LogsNotFound as e:
                 print("logs not found...")
                 # logs may not have been fully ingested into Cloud Logging
-                # Wait another 10 seconds
-                sleep(10)
+                # Wait before trying again
+                sleep(10 * (tries+1))
                 tries += 1
         # log not found
         raise LogsNotFound
