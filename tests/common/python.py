@@ -243,7 +243,7 @@ class CommonPython:
         found_log = log_list[-1]
 
         self.assertIsNotNone(found_log, "expected log text not found")
-        self.assertFalse(found_log.payload.trace_sampled)
+        self.assertFalse(found_log.trace_sampled)
 
     def test_pylogging_extras(self):
         log_text = f"{inspect.currentframe().f_code.co_name}"
