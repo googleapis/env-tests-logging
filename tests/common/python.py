@@ -193,12 +193,57 @@ class CommonPython:
 
         found_trace = log_list[-1].trace
         found_span = log_list[-1].span_id
+        found_sampled = log_list[-1].trace_sampled
         self.assertIsNotNone(found_trace)
         self.assertIn("projects/", found_trace)
+        self.assertTrue(found_sampled)
         if self.environment != "functions":
             # functions seems to override the user's trace value
             self.assertIn(expected_trace, found_trace)
             self.assertEqual(expected_span, found_span)
+
+    def test_flask_traceparent(self):
+        log_text = f"{inspect.currentframe().f_code.co_name}"
+
+        expected_agent = "test-agent"
+        expected_base_url = "http://test"
+        expected_path = "/pylogging"
+        expected_trace = "4bf92f3577b34da6a3ce929d0e0e4736"
+        expected_span = "00f067aa0ba902b7"
+        trace_header = f"00-{expected_trace}-{expected_span}-09"
+
+        log_list = self.trigger_and_retrieve(
+            log_text,
+            "pylogging_flask",
+            path=expected_path,
+            trace="",
+            traceparent=trace_header,
+            base_url=expected_base_url,
+            agent=expected_agent,
+        )
+        found_request = log_list[-1].http_request
+
+        self.assertIsNotNone(found_request)
+
+        found_trace = log_list[-1].trace
+        found_span = log_list[-1].span_id
+        found_sampled = log_list[-1].trace_sampled
+        self.assertIsNotNone(found_trace)
+        self.assertIn("projects/", found_trace)
+        self.assertTrue(found_sampled)
+        if self.environment != "functions":
+            # functions seems to override the user's trace value
+            self.assertIn(expected_trace, found_trace)
+            self.assertEqual(expected_span, found_span)
+
+    def test_pylogging_trace_sampled_set(self):
+        log_text = f"{inspect.currentframe().f_code.co_name}"
+        log_list = self.trigger_and_retrieve(log_text, "pylogging")
+
+        found_log = log_list[-1]
+
+        self.assertIsNotNone(found_log, "expected log text not found")
+        self.assertFalse(found_log.payload.trace_sampled)
 
     def test_pylogging_extras(self):
         log_text = f"{inspect.currentframe().f_code.co_name}"

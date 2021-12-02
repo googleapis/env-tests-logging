@@ -153,13 +153,14 @@ def pylogging_flask(
     base_url="http://google",
     agent="Chrome",
     trace="123",
+    traceparent="",
     **kwargs,
 ):
     import flask
 
     app = flask.Flask(__name__)
     with app.test_request_context(
-        path, base_url, headers={"User-Agent": agent, "X_CLOUD_TRACE_CONTEXT": trace}
+        path, base_url, headers={"User-Agent": agent, "X_CLOUD_TRACE_CONTEXT": trace, "TRACEPARENT":traceparent}
     ):
         logging.info(log_text)
 
