@@ -236,15 +236,6 @@ class CommonPython:
             self.assertIn(expected_trace, found_trace)
             self.assertEqual(expected_span, found_span)
 
-    def test_pylogging_trace_sampled_set(self):
-        log_text = f"{inspect.currentframe().f_code.co_name}"
-        log_list = self.trigger_and_retrieve(log_text, "pylogging")
-
-        found_log = log_list[-1]
-
-        self.assertIsNotNone(found_log, "expected log text not found")
-        self.assertFalse(found_log.trace_sampled)
-
     def test_pylogging_extras(self):
         log_text = f"{inspect.currentframe().f_code.co_name}"
         kwargs = {
