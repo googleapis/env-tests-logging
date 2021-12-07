@@ -196,11 +196,11 @@ class CommonPython:
         found_sampled = log_list[-1].trace_sampled
         self.assertIsNotNone(found_trace)
         self.assertIn("projects/", found_trace)
-        self.assertTrue(found_sampled)
         if self.environment != "functions":
             # functions seems to override the user's trace value
             self.assertIn(expected_trace, found_trace)
             self.assertEqual(expected_span, found_span)
+            self.assertTrue(found_sampled)
 
     def test_flask_traceparent(self):
         log_text = f"{inspect.currentframe().f_code.co_name}"
@@ -230,11 +230,11 @@ class CommonPython:
         found_sampled = log_list[-1].trace_sampled
         self.assertIsNotNone(found_trace)
         self.assertIn("projects/", found_trace)
-        self.assertTrue(found_sampled)
         if self.environment != "functions":
             # functions seems to override the user's trace value
             self.assertIn(expected_trace, found_trace)
             self.assertEqual(expected_span, found_span)
+            self.assertTrue(found_sampled)
 
     def test_pylogging_extras(self):
         log_text = f"{inspect.currentframe().f_code.co_name}"
