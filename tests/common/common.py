@@ -138,10 +138,10 @@ class Common:
             except RpcError as e:
                 print(f"RPC error: {e}")
                 # most RpcErrors come from exceeding the reads per minute quota
-                # wait between 3-10 minutes
+                # wait between 5-15 minutes
                 # use a randomized backoff so parallel runs don't start up at
                 # the same time again
-                sleep(random.randint(180, 600))
+                sleep(random.randint(300, 900))
                 tries += 1
             except LogsNotFound as e:
                 print("logs not found...")
