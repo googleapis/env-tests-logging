@@ -21,9 +21,9 @@
     </dependency>
     <!-- Replaced with the local version of the logging package -->
     <dependency>
-        <groupId>com.google.cloud.local</groupId>
+        <groupId>com.google.cloud</groupId>
         <artifactId>google-cloud-logging</artifactId>
-        <version>0.0.1</version>
+        <version>######</version>
     </dependency>
   </dependencies>
 
