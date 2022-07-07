@@ -1,51 +1,37 @@
-<project xmlns="http://maven.apache.org/POM/4.0.0"
-    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-    xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
-  <modelVersion>4.0.0</modelVersion>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+ <modelVersion>4.0.0</modelVersion>
 
-  <groupId>com.example.cloud.functions</groupId>
-  <artifactId>functions-hello-world</artifactId>
-  <version>1.0.0-SNAPSHOT</version>
-  <properties>
-    <maven.compiler.target>11</maven.compiler.target>
-    <maven.compiler.source>11</maven.compiler.source>
-  </properties>
+ <groupId>functions</groupId>
+ <artifactId>pubsub</artifactId>
+ <version>0.0.1</version>
+ <name>Cloud Pub/Sub Function for GCFv2</name>
 
-  <dependencies>
-    <!-- Required for Function primitives -->
-    <dependency>
-      <groupId>com.google.cloud.functions</groupId>
-      <artifactId>functions-framework-api</artifactId>
-      <version>1.0.4</version>
-      <scope>provided</scope>
+ <properties>
+   <maven.compiler.target>11</maven.compiler.target>
+   <maven.compiler.source>11</maven.compiler.source>
+ </properties>
+
+ <dependencies>
+   <dependency>
+     <groupId>com.google.cloud.functions</groupId>
+     <artifactId>functions-framework-api</artifactId>
+     <version>1.0.4</version>
+   </dependency>
+   <dependency>
+      <groupId>com.google.cloud</groupId>
+      <artifactId>google-cloudevent-types</artifactId>
+      <version>0.1.5</version>
     </dependency>
-    <!-- Replaced with the local version of the logging package -->
+    <dependency>
+      <groupId>io.cloudevents</groupId>
+      <artifactId>cloudevents-api</artifactId>
+      <version>2.2.0</version>
+    </dependency>
     <dependency>
         <groupId>com.google.cloud</groupId>
         <artifactId>google-cloud-logging</artifactId>
-        <version>######</version>
+        <version>3.10.0</version>
     </dependency>
-  </dependencies>
+ </dependencies>
 
-  <build>
-    <plugins>
-      <plugin>
-        <!--
-          Google Cloud Functions Framework Maven plugin
-
-          This plugin allows you to run Cloud Functions Java code
-          locally. Use the following terminal command to run a
-          given function locally:
-
-          mvn function:run -Drun.functionTarget=your.package.yourFunction
-        -->
-        <groupId>com.google.cloud.functions</groupId>
-        <artifactId>function-maven-plugin</artifactId>
-        <version>0.10.0</version>
-        <configuration>
-          <functionTarget>functions.TestFunctions</functionTarget>
-        </configuration>
-      </plugin>
-    </plugins>
-  </build>
 </project>
