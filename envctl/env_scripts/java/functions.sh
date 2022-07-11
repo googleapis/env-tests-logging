@@ -23,7 +23,6 @@ destroy() {
   set +e
   # delete pubsub resources
   gcloud pubsub topics delete $SERVICE_NAME -q  2> /dev/null
-  gcloud pubsub subscriptions delete $SERVICE_NAME-subscriber -q  2> /dev/null
   # delete service
   gcloud functions delete $SERVICE_NAME --region us-west2 -q  2> /dev/null
   set -e
@@ -48,19 +47,22 @@ deploy() {
   gcloud pubsub topics create $SERVICE_NAME 2>/dev/null
   set -e
 
-  mkdir $TMP_DIR/java-cf-logging
-  cp $REPO_ROOT/deployable/java/cf $TMP_DIR/java-cf-logging
+  mkdir -p $TMP_DIR/java-cf-logging/library
+  mkdir -p $TMP_DIR/java-cf-logging/cf
+  
+  cp $REPO_ROOT/deployable/java/_library $TMP_DIR/java-cf-logging/library
+  cp $REPO_ROOT/deployable/java/cf $TMP_DIR/java-cf-logging/cf
+  docker run -it --rm --name cf-java-build-$ENVCTL_ID -v $TMP_DIR/java-cf-logging:/usr/src/java -w /usr/src/java maven:3.8.4 cf/build_jars.sh
 
-  # available runtimes on Jun'22 are Java 11 (java11) and Java 17 (java17)
+    # available runtimes on Jun'22 are Java 11 (java11) and Java 17 (java17)
   # use java11 since it is closest to LTS Java runtime (Java 9)
   RUNTIME="${RUNTIME:-java11}"
 
   pushd $TMP_DIR
   gcloud functions deploy $SERVICE_NAME \
     --entry-point functions.TestFunctions \
-    --source ./java-cf-logging \
+    --source ./java-cf-logging/target/deployment \
     --memory 512MB \
-    --entry-point PubsubFunction \
     --trigger-topic $SERVICE_NAME \
     --runtime $RUNTIME \
     --region us-west2
