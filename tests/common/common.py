@@ -95,7 +95,13 @@ class Common:
 
     @RetryErrors(exception=(LogsNotFound, RpcError), delay=2, max_tries=2)
     def trigger_and_retrieve(
-        self, log_text, snippet, append_uuid=True, ignore_protos=True, max_tries=3, **kwargs
+        self,
+        log_text,
+        snippet,
+        append_uuid=True,
+        ignore_protos=True,
+        max_tries=5,
+        **kwargs,
     ):
         """
         Trigger a snippet deployed in the cloud by envctl, and return resulting
@@ -132,16 +138,16 @@ class Common:
             except RpcError as e:
                 print(f"RPC error: {e}")
                 # most RpcErrors come from exceeding the reads per minute quota
-                # wait at least 60 seconds
-                # use a randomized backoff so parallel runs don't start up at 
+                # wait between 5-15 minutes
+                # use a randomized backoff so parallel runs don't start up at
                 # the same time again
-                sleep(random.randint(60, 300))
+                sleep(random.randint(300, 900))
                 tries += 1
             except LogsNotFound as e:
                 print("logs not found...")
                 # logs may not have been fully ingested into Cloud Logging
                 # Wait before trying again
-                sleep(10 * (tries+1))
+                sleep(10 * (tries + 1))
                 tries += 1
         # log not found
         raise LogsNotFound
@@ -228,7 +234,7 @@ class Common:
         self.assertEqual(found_log.payload, expected_dict)
 
     def test_monitored_resource(self):
-        if self.language == 'java':
+        if self.language == "java":
             # TODO: implement in java
             return True
 
