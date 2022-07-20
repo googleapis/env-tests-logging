@@ -22,6 +22,7 @@ from typing import Callable, Dict, List, Optional
 
 import nox
 
+nox.options.error_on_missing_interpreters = True
 
 TEST_CONFIG = {
     # You can opt out from the test for specific Python versions.
@@ -141,7 +142,7 @@ def tests(session, language, platform):
         session.skip("RUN_ENV_TESTS is set to false, skipping")
     # Sanity check: Only run tests if the environment variable is set.
     if not os.environ.get("GOOGLE_APPLICATION_CREDENTIALS", ""):
-        session.skip("Credentials must be set via environment variable")
+        session.error("Credentials must be set via environment variable")
 
     # Use pre-release gRPC for system tests.
     session.install("--pre", "grpcio")
