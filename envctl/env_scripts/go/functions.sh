@@ -47,8 +47,8 @@ deploy() {
   set +e
   gcloud pubsub topics create $SERVICE_NAME 2>/dev/null
   set -e
-  # Note: functions only supports go111 and go113 at the moment
-  local RUNTIME="go113"
+  # Note: functions only supports go111, go113 and go116 at the moment
+  local RUNTIME="go116"
   
   # Copy over local copy of library to use as dependency
   _deployable_dir=$REPO_ROOT/deployable/$LANGUAGE
