@@ -44,6 +44,10 @@ verify() {
 }
 
 deploy() {
+  # available runtimes on Jun'22 are Java 11 (java11) and Java 17 (java17)
+  # use java11 since it is closest to LTS Java runtime (Java 9)
+  RUNTIME="${RUNTIME:-java11}"
+
   # create pub/sub topic
   set +e
   gcloud pubsub topics create $SERVICE_NAME 2>/dev/null

@@ -18,13 +18,15 @@ WORKDIR /app
 COPY _library ./
 RUN mvn verify --fail-never
 RUN mvn -Dmaven.test.skip=true package
+# copy the latest jar file to java-logging.jar
+RUN cp $(ls target/*.jar | sort -V | tail -n1) target/java-logging.jar
 
 # Compile the deployable code.
 FROM maven:3.8.4 AS build-env
 WORKDIR /app
 COPY pom.xml /app/pom.xml
 # copy over compiled library
-COPY --from=lib-env /app/target/*.jar /app/java-logging.jar
+COPY --from=lib-env /app/target/java-logging.jar /app/java-logging.jar
 # install java-logging
 RUN mvn install:install-file \
     -Dfile=/app/java-logging.jar \
