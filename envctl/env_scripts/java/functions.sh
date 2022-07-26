@@ -56,7 +56,7 @@ deploy() {
   # extract container
   build_container nopush
   id=$(docker create $GCR_PATH)
-  docker cp $id:/app/function-sample-gcp-http-4.0.0.RELEASE.jar $TMP_DIR/deployable-1.0.0.jar
+  docker cp $id:/app/functions-hello-pub-sub-1.2.0.jar $TMP_DIR/deployable-1.0.0.jar
   cp $TMP_DIR/deployable-1.0.0.jar ./out.jar
   docker rm -v $id
   ls $TMP_DIR
@@ -64,7 +64,7 @@ deploy() {
   # deploy
   pushd $TMP_DIR
   gcloud functions deploy $SERVICE_NAME \
-    --entry-point com.example.CloudFunctionMain \
+    --entry-point functions.HelloPubSub \
     --source $TMP_DIR \
     --memory 512MB \
     --trigger-topic $SERVICE_NAME \
