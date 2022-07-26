@@ -24,7 +24,7 @@ RUN cp $(ls target/*.jar | sort -V | tail -n1) target/java-logging.jar
 # Compile the deployable code.
 FROM maven:3.8.4 AS build-env
 WORKDIR /app
-COPY pom.xml /app/pom.xml
+COPY functions/pom.xml /app/pom.xml
 # copy over compiled library
 COPY --from=lib-env /app/target/java-logging.jar /app/java-logging.jar
 # install java-logging
@@ -37,7 +37,7 @@ RUN mvn install:install-file \
     -DgeneratePom=true
 # download dependencies as specified in pom.xml
 RUN mvn verify --fail-never
-COPY src /app/src
+COPY functions/src /app/src
 RUN mvn -Dmaven.test.skip=true package
 
 # Build runtime image.
@@ -45,5 +45,7 @@ FROM openjdk:8-jre-slim
 # Copy the compiled files over.
 COPY --from=build-env /app/target/ /app/
 ENV PORT=8080
+ARG test=1
+RUN ls /app
 # Starts libapp with debugging server at port 5005.
 CMD ["java", "-jar", "/app/deployable-1.0.0.jar"]
