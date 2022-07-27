@@ -35,7 +35,7 @@ public class HelloPubSub implements BackgroundFunction<PubSubMessage> {
 
   @Override
   public void accept(PubSubMessage message, Context context) {
-      String fnName = new String(Base64.getDecoder().decode(message.data.getBytes(StandardCharsets.UTF_8)), StandardCharsets.UTF_8);
+    String fnName = new String(Base64.getDecoder().decode(message.data.getBytes(StandardCharsets.UTF_8)), StandardCharsets.UTF_8);
     Map<String, String> args = message.attributes;
 
     triggerSnippet(fnName, args);

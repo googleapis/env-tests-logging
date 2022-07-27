@@ -38,14 +38,12 @@ RUN mvn install:install-file \
  #download dependencies as specified in pom.xml
 RUN mvn verify --fail-never
 COPY functions/src /app/src
-RUN mvn -Dmaven.test.skip=true package
+RUN mvn assembly:assembly -DdescriptorId=jar-with-dependencies
 
 # Build runtime image.
 FROM openjdk:8-jre-slim
 # Copy the compiled files over.
 COPY --from=build-env /app/target/ /app/
 ENV PORT=8080
-ARG test=1
-RUN ls /app
 # Starts libapp with debugging server at port 5005.
 CMD ["java", "-jar", "/app/deployable-1.0.0.jar"]
