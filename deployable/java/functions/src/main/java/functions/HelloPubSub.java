@@ -27,7 +27,8 @@ import java.util.logging.Logger;
 
 import java.util.Map;
 import java.nio.charset.StandardCharsets;
-
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
 
 public class HelloPubSub implements BackgroundFunction<PubSubMessage> {
   private static final Logger logger = Logger.getLogger(HelloPubSub.class.getName());
@@ -37,14 +38,19 @@ public class HelloPubSub implements BackgroundFunction<PubSubMessage> {
       String fnName = new String(Base64.getDecoder().decode(message.data.getBytes(StandardCharsets.UTF_8)), StandardCharsets.UTF_8);
     Map<String, String> args = message.attributes;
 
-
-    //if (message != null && message.getData() != null) {
-    //  name = new String(
-    //      Base64.getDecoder().decode(message.getData().getBytes(StandardCharsets.UTF_8)),
-    //      StandardCharsets.UTF_8);
-    //}
-    logger.info(fnName);
+    triggerSnippet(fnName, args);
     return;
+  }
+
+  public static void triggerSnippet(String fnName, Map<String,String> args) {
+    try {
+      Snippets obj = new Snippets();
+      Class<?> c = obj.getClass();
+      Method found = c.getDeclaredMethod(fnName, new Class[] {Map.class});
+      found.invoke(obj, args);
+    } catch (NoSuchMethodException | IllegalAccessException | InvocationTargetException e) {
+      System.out.println(e.toString());
+    }
   }
 }
 
