@@ -26,6 +26,7 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import java.util.Map;
+import java.nio.charset.StandardCharsets;
 
 
 public class HelloPubSub implements BackgroundFunction<PubSubMessage> {
@@ -33,20 +34,23 @@ public class HelloPubSub implements BackgroundFunction<PubSubMessage> {
 
   @Override
   public void accept(PubSubMessage message, Context context) {
-    String name = "world";
+      String fnName = new String(Base64.getDecoder().decode(message.data.getBytes(StandardCharsets.UTF_8)), StandardCharsets.UTF_8);
+    Map<String, String> args = message.attributes;
+
+
     //if (message != null && message.getData() != null) {
     //  name = new String(
     //      Base64.getDecoder().decode(message.getData().getBytes(StandardCharsets.UTF_8)),
     //      StandardCharsets.UTF_8);
     //}
-    logger.info(String.format("Hello %s!", name));
+    logger.info(fnName);
     return;
   }
 }
 
 class PubSubMessage {
-  String data;
-  Map<String, String> attributes;
-  String messageId;
-  String publishTime;
+  public String data;
+  public Map<String, String> attributes;
+  public String messageId;
+  public String publishTime;
 }
