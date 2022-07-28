@@ -66,7 +66,7 @@ deploy() {
   # deploy
   pushd $TMP_DIR
   gcloud functions deploy $SERVICE_NAME \
-    --entry-point envtest.deployable.HelloPubSub \
+    --entry-point envtest.deployable.CloudFunctionTrigger \
     --source $TMP_DIR \
     --memory 512MB \
     --trigger-topic $SERVICE_NAME \

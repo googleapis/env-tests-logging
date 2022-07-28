@@ -81,7 +81,7 @@
 			  <transformers>
 				<!-- add Main-Class to manifest file -->
                   <transformer implementation="org.apache.maven.plugins.shade.resource.ManifestResourceTransformer">
-                    <mainClass>envtest.deployable.HelloPubSub</mainClass>
+                    <mainClass>envtest.deployable.CloudFunctionTrigger</mainClass>
                 </transformer>
                 <!-- Fixes error: https://stackoverflow.com/a/71531071 -->
                 <transformer implementation="org.apache.maven.plugins.shade.resource.ServicesResourceTransformer"/>

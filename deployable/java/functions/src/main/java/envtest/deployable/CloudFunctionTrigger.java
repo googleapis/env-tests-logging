@@ -18,8 +18,6 @@ package envtest.deployable;
 
 import com.google.cloud.functions.BackgroundFunction;
 import com.google.cloud.functions.Context;
-//import com.google.events.cloud.pubsub.v1.PubsubMessage;
-//import com.google.pubsub.v1.PubsubMessage;
 import java.nio.charset.StandardCharsets;
 import java.util.Base64;
 import java.util.logging.Level;
@@ -31,8 +29,8 @@ import java.nio.charset.StandardCharsets;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 
-public class HelloPubSub implements BackgroundFunction<PubSubMessage> {
-  private static final Logger logger = Logger.getLogger(HelloPubSub.class.getName());
+public class CloudFunctionTrigger implements BackgroundFunction<PubSubMessage> {
+  private static final Logger logger = Logger.getLogger(CloudFunctionTrigger.class.getName());
 
   @Override
   public void accept(PubSubMessage message, Context context) {
