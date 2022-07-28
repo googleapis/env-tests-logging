@@ -20,7 +20,6 @@ RUN mvn verify --fail-never
 RUN mvn -Dmaven.test.skip=true package
 # copy the latest jar file to java-logging.jar
 RUN cp `ls google-cloud-logging/target/*.jar | grep -v "test" | sort -V | tail -n1` /app/java-logging.jar
-RUN cp `ls grpc-google-cloud-logging-v2/target/*.jar | grep -v "test" | sort -V | tail -n1` /app/grpc-java-logging.jar
 RUN cp `ls proto-google-cloud-logging-v2/target/*.jar | grep -v "test" | sort -V | tail -n1` /app/proto-java-logging.jar
 
 # Compile the deployable code.
@@ -29,20 +28,12 @@ WORKDIR /app
 COPY functions/pom.xml /app/pom.xml
 # copy over compiled library
 COPY --from=lib-env /app/java-logging.jar /app/java-logging.jar
-COPY --from=lib-env /app/grpc-java-logging.jar /app/grpc-java-logging.jar
 COPY --from=lib-env /app/proto-java-logging.jar /app/proto-java-logging.jar
 # install java-logging
 RUN mvn install:install-file \
 	-Dfile=/app/java-logging.jar \
 	-DgroupId=com.google.cloud.local \
 	-DartifactId=google-cloud-logging \
-	-Dversion=0.0.1 \
-	-Dpackaging=jar \
-	-DgeneratePom=true
-RUN mvn install:install-file \
-	-Dfile=/app/grpc-java-logging.jar \
-	-DgroupId=com.google.api.grpc.local \
-	-DartifactId=grpc-google-cloud-logging-v2 \
 	-Dversion=0.0.1 \
 	-Dpackaging=jar \
 	-DgeneratePom=true
@@ -57,7 +48,7 @@ RUN mvn install:install-file \
  #download dependencies as specified in pom.xml
 RUN mvn verify --fail-never
 COPY functions/src /app/src
-RUN mvn package
+RUN mvn -Dmaven.test.skip=true package
 
 # Build runtime image.
 FROM openjdk:8-jre-slim
