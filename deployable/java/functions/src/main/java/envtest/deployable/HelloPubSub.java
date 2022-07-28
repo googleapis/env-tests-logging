@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package functions;
+package envtest.deployable;
 
 import com.google.cloud.functions.BackgroundFunction;
 import com.google.cloud.functions.Context;

@@ -53,6 +53,9 @@ deploy() {
   gcloud pubsub topics create $SERVICE_NAME 2>/dev/null
   set -e
 
+  # copy over snippets
+  cp $REPO_ROOT/deployable/java/src/main/java/envtest/deployable/Snippets.java $REPO_ROOT/deployable/java/functions/src/main/java/envtest/deployable
+
   # extract container
   build_container nopush
   id=$(docker create $GCR_PATH)
@@ -63,7 +66,7 @@ deploy() {
   # deploy
   pushd $TMP_DIR
   gcloud functions deploy $SERVICE_NAME \
-    --entry-point functions.HelloPubSub \
+    --entry-point envtest.deployable.HelloPubSub \
     --source $TMP_DIR \
     --memory 512MB \
     --trigger-topic $SERVICE_NAME \
