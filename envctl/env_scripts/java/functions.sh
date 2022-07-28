@@ -53,9 +53,8 @@ deploy() {
   gcloud pubsub topics create $SERVICE_NAME 2>/dev/null
   set -e
 
-  # copy over snippets
-  cp $REPO_ROOT/deployable/java/src/main/java/envtest/deployable/Snippets.java $REPO_ROOT/deployable/java/functions/src/main/java/envtest/deployable
-
+  # use custom cloud functions Dockerfile
+  export ENV_TEST_DOCKERFILE=Dockerfile.cloudfunctions
   # extract container
   build_container nopush
   id=$(docker create $GCR_PATH)
