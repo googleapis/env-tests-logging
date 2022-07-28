@@ -57,7 +57,7 @@ RUN mvn install:install-file \
  #download dependencies as specified in pom.xml
 RUN mvn verify --fail-never
 COPY functions/src /app/src
-RUN mvn assembly:assembly -DdescriptorId=jar-with-dependencies
+RUN mvn package
 
 # Build runtime image.
 FROM openjdk:8-jre-slim
