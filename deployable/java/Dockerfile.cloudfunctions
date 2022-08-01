@@ -16,7 +16,7 @@
 FROM maven:3.8.4 AS lib-env
 WORKDIR /app
 COPY _library ./
-RUN mvn verify --fail-never
+RUN mvn verify
 RUN mvn -Dmaven.test.skip=true package
 # copy the latest jar file to java-logging.jar
 RUN cp `ls google-cloud-logging/target/*.jar | grep -v "test" | sort -V | tail -n1` /app/java-logging.jar
@@ -46,7 +46,7 @@ RUN mvn install:install-file \
 	-DgeneratePom=true
 
 # download dependencies as specified in pom.xml
-RUN mvn verify --fail-never
+RUN mvn verify
 # copy over cloud functions code
 COPY functions/src /app/src
 # copy over shared Snippets.java file
