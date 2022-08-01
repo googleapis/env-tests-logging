@@ -58,7 +58,7 @@ deploy() {
   # extract container
   build_container nopush
   id=$(docker create $GCR_PATH)
-  docker cp $id:/app/deployable-1.0.0.jar $TMP_DIR/deployable-1.0.0.jar
+  docker cp $id:/app/target/deployable-1.0.0.jar $TMP_DIR/deployable-1.0.0.jar
   docker rm -v $id
   ls $TMP_DIR
 
