@@ -30,7 +30,6 @@ import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 
 public class CloudFunctionTrigger implements BackgroundFunction<PubSubMessage> {
-  private static final Logger logger = Logger.getLogger(CloudFunctionTrigger.class.getName());
 
   @Override
   public void accept(PubSubMessage message, Context context) {
