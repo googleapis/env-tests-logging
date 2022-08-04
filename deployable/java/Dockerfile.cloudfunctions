@@ -13,7 +13,7 @@
 # limitations under the License.
 
 # compile local java-logging library
-FROM maven:3.8.4 AS lib-env
+FROM maven:3.8.6 AS lib-env
 WORKDIR /app
 COPY _library ./
 RUN mvn verify
@@ -23,7 +23,7 @@ RUN cp `ls google-cloud-logging/target/*.jar | grep -v "test" | sort -V | tail -
 RUN cp `ls proto-google-cloud-logging-v2/target/*.jar | grep -v "test" | sort -V | tail -n1` /app/proto-java-logging.jar
 
 # Compile the deployable code.
-FROM maven:3.8.4 AS build-env
+FROM maven:3.8.6 AS build-env
 WORKDIR /app
 COPY functions/pom.xml /app/pom.xml
 # copy over compiled library
