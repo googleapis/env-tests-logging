@@ -25,7 +25,7 @@ fi
 set -e
 
 # create and destroy temporary dir
-UUID=$(python  -c 'import uuid; print(uuid.uuid1())')
+UUID="${UUID:-$(python$ENV_TEST_PY_VERSION  -c 'import uuid; print(uuid.uuid1())')}"
 TMP_DIR=$REPO_ROOT/tmp-$UUID
 mkdir $TMP_DIR
 function finish {
