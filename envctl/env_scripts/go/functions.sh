@@ -25,13 +25,13 @@ destroy() {
   gcloud pubsub topics delete $SERVICE_NAME -q  2> /dev/null
   gcloud pubsub subscriptions delete $SERVICE_NAME-subscriber -q  2> /dev/null
   # delete service
-  gcloud functions delete $SERVICE_NAME --region us-west2 -q  2> /dev/null
+  gcloud functions delete $SERVICE_NAME --region us-west2 -q ${EXTRA_FUNCTIONS_FLAGS-} 2> /dev/null
   set -e
 }
 
 verify() {
   set +e
-  gcloud functions describe $SERVICE_NAME --region us-west2
+  gcloud functions describe $SERVICE_NAME --region us-west2 ${EXTRA_FUNCTIONS_FLAGS-} &> /dev/null
   if [[ $? == 0 ]]; then
      echo "TRUE"
      exit 0
@@ -54,7 +54,9 @@ deploy() {
   # Copy over local copy of library to use as dependency
   _deployable_dir=$REPO_ROOT/deployable/$LANGUAGE
   pushd $SUPERREPO_ROOT/logging
-    tar -cvf $_deployable_dir/lib.tar --exclude internal/env-tests-logging --exclude .nox --exclude docs --exclude __pycache__ .
+    tar -cvf $_deployable_dir/lib.tar \
+      --exclude logging --exclude */env-tests-logging  \
+      --exclude .nox --exclude docs --exclude __pycache__ .
   popd
   mkdir -p $_deployable_dir/logging
   tar -xvf $_deployable_dir/lib.tar --directory $_deployable_dir/logging
@@ -83,7 +85,7 @@ deploy() {
       --trigger-topic $SERVICE_NAME \
       --runtime $RUNTIME \
       --region us-west2 \
-      ${ENV_DEPLOY_FLAGS-}
+      ${EXTRA_FUNCTIONS_FLAGS-}
   popd
 }
 
