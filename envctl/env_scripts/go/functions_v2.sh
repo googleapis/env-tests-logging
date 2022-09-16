@@ -14,8 +14,8 @@
 # limitations under the License.
 
 
-
-
+# Functions gen 2 uses the logic of functions gen 1, 
+# with an extra flag for all gcloud commands
 source "$SCRIPT_DIR/env_scripts/$LANGUAGE/functions.sh"
 
 SERVICE_NAME="v2-${SERVICE_NAME-}"
