@@ -22,6 +22,7 @@ import (
 	"log"
 	"net/http"
 	"os"
+	"strconv"
 	"strings"
 	"time"
 
@@ -233,9 +234,78 @@ func simplelog(args map[string]string) {
 			break
 		}
 	}
+	entry := logging.Entry{
+		Payload:  logtext,
+		Severity: logseverity,
+	}
+	client.Logger(logname).Log(entry)
+}
 
-	logger := client.Logger(logname).StandardLogger(logseverity)
-	logger.Println(logtext)
+// [Optional] envctl go <env> trigger jsonlog log_name=foo,log_text=bar
+func jsonlog(args map[string]string) {
+	ctx := context.Background()
+	projectID, err := metadata.ProjectID()
+	if err != nil {
+		log.Fatalf("metadata.ProjectID: %v", err)
+	}
+	client, err := logging.NewClient(ctx, projectID)
+	if err != nil {
+		log.Fatalf("Failed to create client: %v", err)
+	}
+	defer client.Close()
+
+	logname := "my-log"
+	if val, ok := args["log_name"]; ok {
+		logname = val
+	}
+
+	logtext := "hello world"
+	if val, ok := args["log_text"]; ok {
+		logtext = val
+	}
+
+	logseverity := logging.Info
+	if val, ok := args["severity"]; ok {
+		switch strings.ToUpper(val) {
+		case "DEFAULT":
+			logseverity = logging.Default
+		case "DEBUG":
+			logseverity = logging.Debug
+		case "INFO":
+			logseverity = logging.Info
+		case "NOTICE":
+			logseverity = logging.Notice
+		case "WARNING":
+			logseverity = logging.Warning
+		case "ERROR":
+			logseverity = logging.Error
+		case "CRITICAL":
+			logseverity = logging.Critical
+		case "ALERT":
+			logseverity = logging.Alert
+		case "EMERGENCY":
+			logseverity = logging.Emergency
+		default:
+			break
+		}
+	}
+	payload := make(map[string]interface{})
+	for k, v := range args {
+		if k != "log_name" && k != "log_text" && k != "severity" {
+			// convert int inputs when possible
+			if intVal, err := strconv.Atoi(v); err == nil {
+				payload[k] = intVal
+			} else {
+				payload[k] = v
+			}
+		}
+	}
+	payload["message"] = logtext
+	entry := logging.Entry{
+		Payload:  payload,
+		Severity: logseverity,
+	}
+	client.Logger(logname).Log(entry)
 }
 
 // testLog is a helper function which invokes the correct test functions
@@ -245,6 +315,8 @@ func testLog(message string, attrs map[string]string) {
 		simplelog(attrs)
 	case "stdlog":
 		break
+	case "jsonlog":
+		jsonlog(attrs)
 	default:
 		break
 	}
