@@ -22,6 +22,7 @@ import (
 	"log"
 	"net/http"
 	"os"
+	"reflect"
 	"strconv"
 	"strings"
 	"time"
@@ -192,8 +193,11 @@ func main() {
 }
 
 // ****************** Test Cases ******************
+
+type Snippets struct{}
+
 // [Optional] envctl go <env> trigger simplelog log_name=foo,log_text=bar
-func simplelog(args map[string]string) {
+func (s Snippets) Simplelog(args map[string]string) {
 	ctx := context.Background()
 	projectID, err := metadata.ProjectID()
 	if err != nil {
@@ -215,7 +219,7 @@ func simplelog(args map[string]string) {
 		logtext = val
 	}
 
-	logseverity := _parseSeverity(args["severity"])
+	logseverity := s._parseSeverity(args["severity"])
 
 	entry := logging.Entry{
 		Payload:  logtext,
@@ -225,7 +229,7 @@ func simplelog(args map[string]string) {
 }
 
 // [Optional] envctl go <env> trigger jsonlog log_name=foo,log_text=bar
-func jsonlog(args map[string]string) {
+func (s Snippets) Jsonlog(args map[string]string) {
 	ctx := context.Background()
 	projectID, err := metadata.ProjectID()
 	if err != nil {
@@ -247,7 +251,7 @@ func jsonlog(args map[string]string) {
 		logtext = val
 	}
 
-	logseverity := _parseSeverity(args["severity"])
+	logseverity := s._parseSeverity(args["severity"])
 
 	payload := make(map[string]interface{})
 	for k, v := range args {
@@ -270,7 +274,7 @@ func jsonlog(args map[string]string) {
 
 // https://pkg.go.dev/cloud.google.com/go/logging#hdr-The_Standard_Logger
 // [Optional] envctl go <env> trigger standardlogger log_name=foo,log_text=bar
-func standardlogger(args map[string]string) {
+func (s Snippets) Standardlogger(args map[string]string) {
 	ctx := context.Background()
 	projectID, err := metadata.ProjectID()
 	if err != nil {
@@ -292,7 +296,7 @@ func standardlogger(args map[string]string) {
 		logtext = val
 	}
 
-	logseverity := _parseSeverity(args["severity"])
+	logseverity := s._parseSeverity(args["severity"])
 
 	lg := client.Logger(logname)
 	stdlg := lg.StandardLogger(logseverity)
@@ -301,7 +305,7 @@ func standardlogger(args map[string]string) {
 
 // https://pkg.go.dev/cloud.google.com/go/logging#hdr-Synchronous_Logging
 // [Optional] envctl go <env> trigger synclog log_name=foo,log_text=bar
-func synclog(args map[string]string) {
+func (s Snippets) Synclog(args map[string]string) {
 	ctx := context.Background()
 	projectID, err := metadata.ProjectID()
 	if err != nil {
@@ -323,7 +327,7 @@ func synclog(args map[string]string) {
 		logtext = val
 	}
 
-	logseverity := _parseSeverity(args["severity"])
+	logseverity := s._parseSeverity(args["severity"])
 
 	lg := client.Logger(logname)
 	entry := logging.Entry{
@@ -335,7 +339,7 @@ func synclog(args map[string]string) {
 
 // https://pkg.go.dev/cloud.google.com/go/logging#hdr-Redirecting_log_ingestion
 // [Optional] envctl go <env> trigger stdoutlog log_name=foo,log_text=bar
-func stdoutlog(args map[string]string) {
+func (s Snippets) Stdoutlog(args map[string]string) {
 	ctx := context.Background()
 	projectID, err := metadata.ProjectID()
 	if err != nil {
@@ -357,7 +361,7 @@ func stdoutlog(args map[string]string) {
 		logtext = val
 	}
 
-	logseverity := _parseSeverity(args["severity"])
+	logseverity := s._parseSeverity(args["severity"])
 
 	lg := client.Logger(logname, logging.RedirectAsJSON(os.Stdout))
 	entry := logging.Entry{
@@ -367,7 +371,7 @@ func stdoutlog(args map[string]string) {
 	lg.LogSync(ctx, entry)
 }
 
-func _parseSeverity(val string) logging.Severity {
+func (s Snippets) _parseSeverity(val string) logging.Severity {
 	logseverity := logging.Info
 	switch strings.ToUpper(val) {
 	case "DEFAULT":
@@ -394,22 +398,22 @@ func _parseSeverity(val string) logging.Severity {
 	return logseverity
 }
 
+func (s Snippets) Test() {
+	log.Printf("Test")
+}
+
 // testLog is a helper function which invokes the correct test functions
 func testLog(message string, attrs map[string]string) {
-	switch message {
-	case "simplelog":
-		simplelog(attrs)
-	case "stdlog":
-		break
-	case "jsonlog":
-		jsonlog(attrs)
-	case "standardlogger":
-		standardlogger(attrs)
-	case "synclog":
-		synclog(attrs)
-	case "stdoutlog":
-		stdoutlog(attrs)
-	default:
-		break
+	// call the requested snippet using reflection
+	snippets := Snippets{}
+	// only exported methods can be called through reflection
+	// capitalize input to match method signature
+	methodName := strings.Title(message)
+	method := reflect.ValueOf(snippets).MethodByName(methodName)
+	if method.IsValid() {
+		in := []reflect.Value{reflect.ValueOf(attrs)}
+		method.Call(in)
+	} else {
+		log.Printf("invalid snippet")
 	}
 }
