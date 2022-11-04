@@ -18,9 +18,8 @@ import unittest
 import google.cloud.logging
 
 from ..common.common import Common
-from ..common.common import CommonGolang
-from ..common.common import CommonStdout
-
+from .go import CommonGolang
+from .stdout import CommonStdout
 
 class TestCloudRun(Common, CommonGolang, CommonStdout, unittest.TestCase):
 

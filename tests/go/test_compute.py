@@ -16,9 +16,8 @@ import logging
 import unittest
 
 import google.cloud.logging
-
 from ..common.common import Common
-from ..common.common import CommonGolang
+from .go import CommonGolang
 
 class TestComputeEngine(Common, CommonGolang, unittest.TestCase):
 
