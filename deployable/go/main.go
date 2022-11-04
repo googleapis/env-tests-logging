@@ -266,7 +266,7 @@ func (s Snippets) Jsonlog(args map[string]string) {
 	}
 	payload["message"] = logtext
 	entry := logging.Entry{
-		Payload:  logtext,
+		Payload:  payload,
 		Severity: logseverity,
 	}
 	client.Logger(logname).Log(entry)
