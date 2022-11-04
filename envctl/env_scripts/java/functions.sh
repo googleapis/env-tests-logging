@@ -26,13 +26,13 @@ destroy() {
   gcloud pubsub topics delete $SERVICE_NAME -q  2> /dev/null
   gcloud pubsub subscriptions delete $SERVICE_NAME-subscriber -q  2> /dev/null
   # delete service
-  gcloud functions delete $SERVICE_NAME --region us-west2 -q  2> /dev/null
+  gcloud functions delete $SERVICE_NAME --region us-west2 -q ${EXTRA_FUNCTIONS_FLAGS-} 2> /dev/null
   set -e
 }
 
 verify() {
   set +e
-  gcloud functions describe $SERVICE_NAME --region us-west2 > /dev/null
+  gcloud functions describe $SERVICE_NAME --region us-west2 ${EXTRA_FUNCTIONS_FLAGS-} > /dev/null
   if [[ $? == 0 ]]; then
      echo "TRUE"
      exit 0
@@ -70,7 +70,8 @@ deploy() {
     --memory 512MB \
     --trigger-topic $SERVICE_NAME \
     --runtime $RUNTIME \
-    --region us-west2
+    --region us-west2 \
+    ${EXTRA_FUNCTIONS_FLAGS-}
   popd
 
 }
