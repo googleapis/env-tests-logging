@@ -18,9 +18,10 @@ import unittest
 import google.cloud.logging
 
 from ..common.common import Common
+from ..common.common import CommonGolang
+from ..common.common import CommonStdout
 
-
-class TestCloudFunctions(Common, unittest.TestCase):
+class TestCloudFunctions(Common, CommonGolang, CommonStdout, unittest.TestCase):
 
     environment = "functions"
     language = "go"

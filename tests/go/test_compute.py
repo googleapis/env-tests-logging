@@ -18,9 +18,9 @@ import unittest
 import google.cloud.logging
 
 from ..common.common import Common
+from ..common.common import CommonGolang
 
-
-class TestComputeEngine(Common, unittest.TestCase):
+class TestComputeEngine(Common, CommonGolang, unittest.TestCase):
 
     environment = "compute"
     language = "go"
