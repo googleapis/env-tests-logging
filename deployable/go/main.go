@@ -21,6 +21,7 @@ import (
 	"io/ioutil"
 	"log"
 	"net/http"
+	"net/url"
 	"os"
 	"reflect"
 	"strconv"
@@ -118,9 +119,22 @@ func pullMsgsSync(sub *pubsub.Subscription) error {
 // Initializations for all GCP services
 var ctx context.Context
 
+// global project id
+var projectID string
+
 // init executes for all environments, regardless if its a program or package
 func init() {
 	ctx = context.Background()
+	// populate projectId
+	var found bool
+	projectID, found = os.LookupEnv("PROJECT_ID")
+	if !found {
+		var err error
+		projectID, err = metadata.ProjectID()
+		if err != nil {
+			log.Fatalf("metadata.ProjectID: %v", err)
+		}
+	}
 }
 
 // main runs for all environments except GCF
@@ -129,14 +143,6 @@ func main() {
 	// Enable app subscriber for all environments except GCR
 	if os.Getenv("ENABLE_SUBSCRIBER") == "true" {
 		// first look for project id in env var, then check the metadata
-		projectID, found := os.LookupEnv("PROJECT_ID")
-		if !found {
-			var err error
-			projectID, err = metadata.ProjectID()
-			if err != nil {
-				log.Fatalf("metadata.ProjectID: %v", err)
-			}
-		}
 		topicID := os.Getenv("PUBSUB_TOPIC")
 		if topicID == "" {
 			topicID = "logging-test"
@@ -199,10 +205,6 @@ type Snippets struct{}
 // [Optional] envctl go <env> trigger simplelog log_name=foo,log_text=bar
 func (s Snippets) Simplelog(args map[string]string) {
 	ctx := context.Background()
-	projectID, err := metadata.ProjectID()
-	if err != nil {
-		log.Fatalf("metadata.ProjectID: %v", err)
-	}
 	client, err := logging.NewClient(ctx, projectID)
 	if err != nil {
 		log.Fatalf("Failed to create client: %v", err)
@@ -231,10 +233,6 @@ func (s Snippets) Simplelog(args map[string]string) {
 // [Optional] envctl go <env> trigger jsonlog log_name=foo,log_text=bar
 func (s Snippets) Jsonlog(args map[string]string) {
 	ctx := context.Background()
-	projectID, err := metadata.ProjectID()
-	if err != nil {
-		log.Fatalf("metadata.ProjectID: %v", err)
-	}
 	client, err := logging.NewClient(ctx, projectID)
 	if err != nil {
 		log.Fatalf("Failed to create client: %v", err)
@@ -276,10 +274,6 @@ func (s Snippets) Jsonlog(args map[string]string) {
 // [Optional] envctl go <env> trigger standardlogger log_name=foo,log_text=bar
 func (s Snippets) Standardlogger(args map[string]string) {
 	ctx := context.Background()
-	projectID, err := metadata.ProjectID()
-	if err != nil {
-		log.Fatalf("metadata.ProjectID: %v", err)
-	}
 	client, err := logging.NewClient(ctx, projectID)
 	if err != nil {
 		log.Fatalf("Failed to create client: %v", err)
@@ -307,10 +301,6 @@ func (s Snippets) Standardlogger(args map[string]string) {
 // [Optional] envctl go <env> trigger synclog log_name=foo,log_text=bar
 func (s Snippets) Synclog(args map[string]string) {
 	ctx := context.Background()
-	projectID, err := metadata.ProjectID()
-	if err != nil {
-		log.Fatalf("metadata.ProjectID: %v", err)
-	}
 	client, err := logging.NewClient(ctx, projectID)
 	if err != nil {
 		log.Fatalf("Failed to create client: %v", err)
@@ -341,10 +331,6 @@ func (s Snippets) Synclog(args map[string]string) {
 // [Optional] envctl go <env> trigger stdoutlog log_name=foo,log_text=bar
 func (s Snippets) Stdoutlog(args map[string]string) {
 	ctx := context.Background()
-	projectID, err := metadata.ProjectID()
-	if err != nil {
-		log.Fatalf("metadata.ProjectID: %v", err)
-	}
 	client, err := logging.NewClient(ctx, projectID)
 	if err != nil {
 		log.Fatalf("Failed to create client: %v", err)
