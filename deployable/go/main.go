@@ -227,6 +227,18 @@ func (s Snippets) Simplelog(args map[string]string) {
 		Payload:  logtext,
 		Severity: logseverity,
 	}
+	// attach http request object if passed in
+	if input_url, ok := args["http_request_url"]; ok {
+		log.Printf("Got url :%q\n", input_url)
+		if parsed_url, err := url.Parse(input_url); err == nil {
+			entry.HTTPRequest = &logging.HTTPRequest{
+				Request: &http.Request{
+					URL:    parsed_url,
+					Method: "POST",
+				},
+			}
+		}
+	}
 	client.Logger(logname).Log(entry)
 }
 
@@ -324,6 +336,17 @@ func (s Snippets) Synclog(args map[string]string) {
 		Payload:  logtext,
 		Severity: logseverity,
 	}
+	// attach http request object if passed in
+	if input_url, ok := args["http_request_url"]; ok {
+		if parsed_url, err := url.Parse(input_url); err == nil {
+			entry.HTTPRequest = &logging.HTTPRequest{
+				Request: &http.Request{
+					URL:    parsed_url,
+					Method: "POST",
+				},
+			}
+		}
+	}
 	lg.LogSync(ctx, entry)
 }
 
@@ -353,6 +376,17 @@ func (s Snippets) Stdoutlog(args map[string]string) {
 	entry := logging.Entry{
 		Payload:  logtext,
 		Severity: logseverity,
+	}
+	// attach http request object if passed in
+	if input_url, ok := args["http_request_url"]; ok {
+		if parsed_url, err := url.Parse(input_url); err == nil {
+			entry.HTTPRequest = &logging.HTTPRequest{
+				Request: &http.Request{
+					URL:    parsed_url,
+					Method: "POST",
+				},
+			}
+		}
 	}
 	lg.LogSync(ctx, entry)
 }
