@@ -229,7 +229,6 @@ func (s Snippets) Simplelog(args map[string]string) {
 	}
 	// attach http request object if passed in
 	if input_url, ok := args["http_request_url"]; ok {
-		log.Printf("Got url :%q\n", input_url)
 		if parsed_url, err := url.Parse(input_url); err == nil {
 			entry.HTTPRequest = &logging.HTTPRequest{
 				Request: &http.Request{
