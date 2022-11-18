@@ -44,6 +44,22 @@ verify() {
   set -e
 }
 
+build_go_container() {
+  export GCR_PATH=gcr.io/$PROJECT_ID/logging:$SERVICE_NAME
+  # copy super-repo into deployable dir
+  _env_tests_relative_path=${REPO_ROOT#"$SUPERREPO_ROOT/"}
+  _deployable_dir=$REPO_ROOT/deployable/$LANGUAGE
+
+  # copy over local copy of library
+  pushd $SUPERREPO_ROOT/logging
+    tar -cvf $_deployable_dir/lib.tar --exclude internal/env-tests-logging --exclude env-tests-logging --exclude .nox --exclude docs --exclude __pycache__ .
+  popd
+  mkdir -p $_deployable_dir/logging
+  tar -xvf $_deployable_dir/lib.tar --directory $_deployable_dir/logging
+  # build container
+  docker build -t $GCR_PATH $_deployable_dir
+}
+
 deploy() {
   ARG=${1:-none}
   if [[ -z "${GOOGLE_APPLICATION_CREDENTIALS}" ]]; then
@@ -56,7 +72,7 @@ deploy() {
   else
     FLAG="-d"
   fi
-  build_container nopush
+  build_go_container nopush
   docker run --rm \
     --name $SERVICE_NAME \
     -v $GOOGLE_APPLICATION_CREDENTIALS:/service-account.json \

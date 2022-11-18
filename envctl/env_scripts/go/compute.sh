@@ -54,7 +54,7 @@ build_go_container(){
 
   # copy over local copy of library
   pushd $SUPERREPO_ROOT/logging
-    tar -cvf $_deployable_dir/lib.tar --exclude internal/env-tests-logging --exclude .nox --exclude docs --exclude __pycache__ .
+    tar -cvf $_deployable_dir/lib.tar --exclude env-tests-logging --exclude internal/env-tests-logging --exclude .nox --exclude docs --exclude __pycache__ .
   popd
   mkdir -p $_deployable_dir/logging
   tar -xvf $_deployable_dir/lib.tar --directory $_deployable_dir/logging

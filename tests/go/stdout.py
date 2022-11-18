@@ -67,3 +67,18 @@ class CommonStdout:
 
             self.assertEqual(found_severity.lower(), severity.lower())
 
+    def test_http_request_stdout(self):
+        log_text = f"{inspect.currentframe().f_code.co_name}"
+        test_url = "www.google.com"
+        log_list = self.trigger_and_retrieve(log_text, "stdoutlog", http_request_url=test_url)
+
+        found_log = log_list[-1]
+
+        self.assertIsNotNone(found_log, "expected log text not found")
+
+        found_request = log_list[-1].http_request
+        self.assertIsNotNone(found_request)
+        self.assertIsNotNone(found_request["requestUrl"])
+        self.assertEqual(found_request["requestUrl"], test_url)
+
+
