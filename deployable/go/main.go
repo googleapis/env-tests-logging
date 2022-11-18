@@ -344,6 +344,7 @@ func (s Snippets) Synclog(args map[string]string) {
 					Method: "POST",
 				},
 			}
+			entry.HTTPRequest.Latency = 100000
 		}
 	}
 	lg.LogSync(ctx, entry)
@@ -385,6 +386,7 @@ func (s Snippets) Stdoutlog(args map[string]string) {
 					Method: "POST",
 				},
 			}
+			entry.HTTPRequest.Latency = 100000
 		}
 	}
 	lg.LogSync(ctx, entry)
