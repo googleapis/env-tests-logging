@@ -152,6 +152,7 @@ def tests(session, language, platform):
     # Install all test dependencies, then install this package into the
     # virtualenv's dist-packages.
     session.install(
+        "grpcio==1.51.1", # pinned to avoid https://github.com/grpc/grpc/issues/31885 TODO: revert
         "mock",
         "pytest",
         "google-cloud-testutils",
