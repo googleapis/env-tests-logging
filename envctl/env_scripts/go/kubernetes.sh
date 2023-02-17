@@ -66,7 +66,6 @@ attach_or_create_gke_cluster(){
 }
 
 build_go_container(){
-  set -x
   export GCR_PATH=gcr.io/$PROJECT_ID/logging:$SERVICE_NAME
   # copy super-repo into deployable dir
   _env_tests_relative_path=${REPO_ROOT#"$SUPERREPO_ROOT/"}
@@ -80,8 +79,6 @@ build_go_container(){
   tar -xvf $_deployable_dir/lib.tar --directory $_deployable_dir/logging
   # build container
   docker build -t $GCR_PATH $_deployable_dir --push
-  docker build -t $GCR_PATH $_deployable_dir --load
-  docker images
   docker push $GCR_PATH
 }
 
