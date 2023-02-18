@@ -48,29 +48,15 @@ deploy() {
   gcloud pubsub topics create $SERVICE_NAME 2>/dev/null
   set -ex
   # set up deployment directory
-  # Copy over local copy of library to use as dependency
-  _deployable_dir=$REPO_ROOT/deployable/$LANGUAGE
+  # copy over local copy of library
   pushd $SUPERREPO_ROOT/logging
-    tar -cvf $_deployable_dir/lib.tar \
-      --exclude logging --exclude */env-tests-logging  \
-      --exclude .nox --exclude docs --exclude __pycache__ .
+    tar -cvf $TMP_DIR/lib.tar --exclude .git/ --exclude internal/env-tests-logging --exclude .nox --exclude docs --exclude __pycache__ .
   popd
-  mkdir -p $_deployable_dir/logging
-  tar -xvf $_deployable_dir/lib.tar --directory $_deployable_dir/logging
-
-  # Create vendor folder based on local dependency
-  pushd $REPO_ROOT/deployable/go
-    go mod tidy
-    go mod vendor
-  popd
-
-  # move code into a temp directory used to deploy the cloud function
-  cp -rf $REPO_ROOT/deployable/go/vendor $TMP_DIR/vendor
-
-  # clean up vendor folder
-  pushd $REPO_ROOT/deployable/go
-    rm -rf vendor/
-  popd
+  mkdir $TMP_DIR/logging
+  tar -xvf $TMP_DIR/lib.tar --directory $TMP_DIR/logging
+  # copy test code and Go dependencies
+  cp $REPO_ROOT/deployable/go/*.go $TMP_DIR
+  cp $REPO_ROOT/deployable/go/go.* $TMP_DIR
 
   # manual_scaling allows 1 instance to continuously run regardless of the load level.
   cat <<EOF > $TMP_DIR/app.yaml
@@ -84,6 +70,7 @@ deploy() {
 EOF
   # deploy
   pushd $TMP_DIR
+    go mod tidy
     gcloud app deploy -q
   popd
   # wait for the pub/sub subscriber to start
