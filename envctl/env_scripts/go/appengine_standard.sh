@@ -60,7 +60,7 @@ deploy() {
 
   # manual_scaling allows 1 instance to continuously run regardless of the load level.
   cat <<EOF > $TMP_DIR/app.yaml
-    runtime: go116
+    runtime: go119
     service: $SERVICE_NAME
     manual_scaling:
       instances: 1
