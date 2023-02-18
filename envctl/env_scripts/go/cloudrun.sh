@@ -53,7 +53,7 @@ build_go_container() {
   mkdir -p $_deployable_dir/logging
   tar -xvf $_deployable_dir/lib.tar --directory $_deployable_dir/logging
   # build container
-  docker build -t $GCR_PATH $_deployable_dir
+  docker build -t $GCR_PATH $_deployable_dir --load
   docker push $GCR_PATH
 }
 
