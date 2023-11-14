@@ -5,4 +5,4 @@ pytz==2021.1
 pandas>=1.1.5
 itsdangerous==2.1.2
 jinja2==3.0.3
-werkzeug==2.0.2
+werkzeug==2.3.8
